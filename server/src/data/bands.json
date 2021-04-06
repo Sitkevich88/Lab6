@@ -1,0 +1,76 @@
+[
+  {
+    "id": 100000,
+    "name": "\t",
+    "coordinates": {
+      "x": 222222222222222222,
+      "y": 1111111111
+    },
+    "creationDate": "Mar 11, 2021 2:07:49 AM",
+    "description": "",
+    "establishmentDate": "2021-02-02T00:00:00Z",
+    "genre": "POP",
+    "bestAlbum": {
+      "name": "null ",
+      "tracks": 1,
+      "length": 1
+    }
+  },
+  {
+    "id": 2,
+    "name": "Dayte tank (!)",
+    "coordinates": {
+      "x": 0,
+      "y": 1
+    },
+    "creationDate": "Feb 17, 2021 10:48:13 PM",
+    "numberOfParticipants": 2147483647,
+    "description": "catchy lyrics",
+    "establishmentDate": "2007-01-01T00:00:00+03:00[Europe/Moscow]",
+    "genre": "ROCK",
+    "bestAlbum": {
+      "name": "Man hours",
+      "tracks": 10,
+      "length": 34,
+      "sales": 2.88
+    }
+  },
+  {
+    "id": 3,
+    "name": "Nothing but Thieves",
+    "coordinates": {
+      "x": 4,
+      "y": 8
+    },
+    "creationDate": "Feb 26, 2021 8:08:17 PM",
+    "numberOfParticipants": 5,
+    "description": "",
+    "establishmentDate": "2012-01-01T00:00:00Z",
+    "genre": "ROCK",
+    "bestAlbum": {
+      "name": "Moral Panic",
+      "tracks": 11,
+      "length": 43,
+      "sales": 50.0
+    }
+  },
+  {
+    "id": 1,
+    "name": "Twenty One Pilots",
+    "coordinates": {
+      "x": 0,
+      "y": 0
+    },
+    "creationDate": "Feb 17, 2021 10:48:13 PM",
+    "numberOfParticipants": 2,
+    "description": "very popular",
+    "establishmentDate": "2009-01-01T00:00:00-06:00[America/Chicago]",
+    "genre": "HIP_HOP",
+    "bestAlbum": {
+      "name": "Trench",
+      "tracks": 14,
+      "length": 56,
+      "sales": 100.34
+    }
+  }
+]
