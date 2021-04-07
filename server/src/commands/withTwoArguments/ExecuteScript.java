@@ -3,6 +3,8 @@ package commands.withTwoArguments;
 
 
 import utils.CommandsParser;
+import utils.MessagesForClient;
+import utils.ParserMode;
 
 /**
  * Command 'execute_script'. Executes script.
@@ -19,7 +21,12 @@ public class ExecuteScript {
 
 
     public void execute(){
-        CommandsParser.loadScript(script);
+        if (CommandsParser.getLastMode().equals(ParserMode.REQUEST)){
+            CommandsParser.loadScript(script);
+        }else {
+            MessagesForClient.recordMessage("Script path is unreachable");
+        }
+
     }
 
 }

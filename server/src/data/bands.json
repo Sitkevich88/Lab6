@@ -17,6 +17,25 @@
     }
   },
   {
+    "id": 100001,
+    "name": "Anacondaz",
+    "coordinates": {
+      "x": 1,
+      "y": 3
+    },
+    "creationDate": "Apr 7, 2021 12:53:47 PM",
+    "numberOfParticipants": 6,
+    "description": "",
+    "establishmentDate": "2009-01-01T00:00:00-02:00",
+    "genre": "HIP_HOP",
+    "bestAlbum": {
+      "name": "My kids will not miss",
+      "tracks": 8,
+      "length": 28,
+      "sales": 4.0
+    }
+  },
+  {
     "id": 2,
     "name": "Dayte tank (!)",
     "coordinates": {
