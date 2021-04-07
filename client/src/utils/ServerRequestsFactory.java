@@ -21,8 +21,8 @@ public class ServerRequestsFactory {
                     case ("help"):
                     case ("info"):
                     case ("show"):
-                    case ("exit"):
                     case ("sort"):
+                    case ("exit"):
                     case ("sum_of_number_of_participants"):
                     case ("clear"):
                     case ("print_field_ascending_description"):
@@ -45,6 +45,7 @@ public class ServerRequestsFactory {
                     case ("execute_script"):
                         String script = readScript(str[1]);
                         request = new ServerRequest(str[0], script);
+                        running = false;
                         break;
                     default:
                         System.out.println("Unknown command");

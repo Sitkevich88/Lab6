@@ -1,3 +1,4 @@
+execute_script .\src\data\script.txt
 add
 Anacondaz
 1
@@ -11,3 +12,7 @@ My kids will not miss
 8
 28
 4
+execute_script .\src\data\script.txt
+info
+execute_script .\src\data\script.txt
+exit

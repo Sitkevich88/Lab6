@@ -45,7 +45,7 @@ public class Client {
         while (running){
             shouldReceive = true;
             sendRequest();
-            if (running==false){
+            if (!running){
                 continue;
             }
             if (shouldReceive){
@@ -59,6 +59,10 @@ public class Client {
         ServerRequest request = requestsFactory.getRequestFromConsole();
         if (request.getCommand().equals("exit")){
             running = false;
+        } else if (request.getScript()!=null && request.getScript().length()>0){
+            if (request.getScript().contains("exit")){
+                running = false;
+            }
         }
         buffer = null;
         try {
@@ -87,7 +91,9 @@ public class Client {
             channel.receive(buffer);
             buffer.flip();
             ClientRequest clientRequest = (ClientRequest) serializer.deserialize(buffer.array());
-            System.out.println(clientRequest.getMessages());
+            if (clientRequest.getMessages()!=null && clientRequest.getMessages().length()>0){
+                System.out.println(clientRequest.getMessages());
+            }
         } catch (IOException e) {
             System.out.println("IO error, No requests are received");
         } catch (ClassNotFoundException e) {
