@@ -4,11 +4,14 @@ import commands.withMaxOneArgument.*;
 import commands.withTwoArguments.*;
 import data.MusicBand;
 import data.ServerRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Stack;
 
 public class RequestsHandler {
 
+    private static final Logger logger = LoggerFactory.getLogger(RequestsHandler.class);
     private Stack<MusicBand> collection;
     private CollectionSaver collectionSaver;
 
@@ -22,6 +25,7 @@ public class RequestsHandler {
         do{
             try {
                 str = CommandsParser.parseArguments(request);
+                logger.warn("Server is handling \"" + str[0] + "\" command");
                 Sort sorter = new Sort();
                 collection = sorter.invoke(collection);
                 switch (str[0]) {
@@ -49,8 +53,8 @@ public class RequestsHandler {
                     case ("exit"):
                         new Save(collection, collectionSaver);
                         CommandsParser.clearBuffer();
-                        //return false;
-                        break;
+                        logger.info("One client has disconnected via \"exit\" command");
+                        return false;
                     case ("sort"):
                         Sort sorter1 = new Sort();
                         collection = sorter1.invoke(collection);

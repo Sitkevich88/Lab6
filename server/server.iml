@@ -27,5 +27,8 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="library" exported="" name="slf4j-api-1.7.2" level="project" />
+    <orderEntry type="library" exported="" name="logback-classic-1.2.3" level="project" />
+    <orderEntry type="library" name="logback-core-1.2.3" level="project" />
   </component>
 </module>
