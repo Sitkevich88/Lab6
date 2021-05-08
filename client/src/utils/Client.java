@@ -2,8 +2,12 @@ package utils;
 
 import data.ClientRequest;
 import data.ServerRequest;
+import data.UserData;
+import utils.auth.UserAuthorisation;
+
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.net.Socket;
 import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
@@ -15,7 +19,7 @@ import java.nio.channels.UnresolvedAddressException;
  * Client
  */
 
-public class Client extends Thread {
+public class Client {
 
     private ServerRequestsFactory requestsFactory;
     private Serializer serializer;
@@ -58,11 +62,12 @@ public class Client extends Thread {
      * runs client
      */
 
-    @Override
     public void run() {
 
         boolean connected = connect();
         if (connected){
+            String username = authorise();
+            requestsFactory.addUsername(username);
             while (running){
                 shouldReceive = true;
                 sendRequest();
@@ -75,6 +80,44 @@ public class Client extends Thread {
             }
         }
         close();
+    }
+
+    private String authorise(){
+        UserData userData = null;
+        buffer = null;
+        boolean successful = false;
+        while (!successful){
+            userData =  new UserAuthorisation().authorise();
+            try {
+                buffer = serializer.serialize(userData);
+                channel.send(buffer, serverAddress);
+            } catch (IOException e) {
+                System.out.println("IO error\nRequest has not been sent");
+            }
+            buffer = ByteBuffer.allocate(PACKET_SIZE);
+            try {
+                selector = Selector.open();
+                key = channel.register(selector, SelectionKey.OP_READ);
+                selector.select(3000);
+                channel.receive(buffer);
+                buffer.flip();
+                ClientRequest clientRequest = (ClientRequest) serializer.deserialize(buffer.array());
+                if (clientRequest.getMessages()!=null && clientRequest.getMessages().length()>0){
+                    System.out.println(clientRequest.getMessages());
+                    if (clientRequest.getMessages().toLowerCase().contains("success")){
+                        successful = true;
+                    }
+                }
+            } catch (IOException e) {
+                System.out.println("Server is not responding. Send your authorisation form later");
+
+            } catch (ClassNotFoundException e) {
+                System.out.println("Client received an unreadable request");
+            }catch (NullPointerException e){
+                System.exit(0);
+            }
+        }
+        return userData.getLogin();
     }
 
     /**
@@ -142,7 +185,7 @@ public class Client extends Thread {
 
             }
         } catch (IOException e) {
-            System.out.println("Server does not respond. Send new request later");
+            System.out.println("Server is not responding. Send new request later");
         } catch (ClassNotFoundException e) {
             System.out.println("Client received an unreadable request");
         }catch (NullPointerException e){

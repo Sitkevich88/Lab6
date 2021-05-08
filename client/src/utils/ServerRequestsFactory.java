@@ -10,6 +10,8 @@ import java.io.IOException;
 
 public class ServerRequestsFactory {
 
+    private String username;
+
     public ServerRequest getRequestFromConsole() {
         ServerRequest request = null;
         boolean running = false;
@@ -21,30 +23,35 @@ public class ServerRequestsFactory {
                     case ("help"):
                     case ("info"):
                     case ("show"):
+                    case ("show_all"):
                     case ("sort"):
                     case ("exit"):
                     case ("sum_of_number_of_participants"):
                     case ("clear"):
                     case ("print_field_ascending_description"):
-                        request = new ServerRequest(str[0]);
+                        request = new ServerRequest(username, str[0]);
                         running = false;
                         break;
                     case ("add"):
-                    case ("update"):
                         ProtoMusicBandWithCorrectFieldsCreator pBandCreator = new ProtoMusicBandWithCorrectFieldsCreator();
-                        request = new ServerRequest(str[0], pBandCreator.createProtoMusicBand());
+                        request = new ServerRequest(username, str[0],pBandCreator.createProtoMusicBand());
+                        running = false;
+                        break;
+                    case ("update"):
+                        ProtoMusicBandWithCorrectFieldsCreator pBandCreator2 = new ProtoMusicBandWithCorrectFieldsCreator();
+                        request = new ServerRequest(username, str[0], new String[]{str[1]},pBandCreator2.createProtoMusicBand());
                         running = false;
                         break;
                     case ("remove_by_id"):
-                    case ("insert_at"):
+                    //case ("insert_at"):
                     case ("remove_greater"):
                     case ("count_greater_than_best_album"):
-                        request = new ServerRequest(str[0], new String[]{str[1]});
+                        request = new ServerRequest(username, str[0], new String[]{str[1]});
                         running = false;
                         break;
                     case ("execute_script"):
                         String script = readScript(str[1]);
-                        request = new ServerRequest(str[0], script);
+                        request = new ServerRequest(username, str[0], script);
                         running = false;
                         break;
                     default:
@@ -81,6 +88,10 @@ public class ServerRequestsFactory {
             script = "";
         }
         return script;
+    }
+
+    public void addUsername(String username){
+        this.username = username;
     }
 
 }
