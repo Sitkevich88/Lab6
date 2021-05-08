@@ -28,13 +28,13 @@ public class ProtoMusicBandCreator {
             int tracks = checker.nextInt( "Insert the number of tracks in their best album : ", false, true).intValue();
             int length = checker.nextInt("Insert the length of their best album : ",false, true).intValue();
             Float sales = checker.nextFloat("Insert the sales of their best album : ", true,true);
-            ProtoMusicBand band = new ProtoMusicBand(name, new Coordinates(x, y),
+            ProtoMusicBand pBand = new ProtoMusicBand(name, new Coordinates(x, y),
                     numberOfParticipants, description, establishmentDate,
                     genre, new Album(albumName, tracks, length, sales));
 
-            return band;
+            return pBand;
         }catch (EmptyBufferException e){
-            MessagesForClient.recordMessage("Script contains an unparsable MusicBand field");
+            MessagesForClient.recordMessage("Script contains a MusicBand field which cannot be parsed");
             return null;
         }
 

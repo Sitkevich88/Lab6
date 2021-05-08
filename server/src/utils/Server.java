@@ -1,13 +1,18 @@
 package utils;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import org.slf4j.Logger;
 import data.*;
+import utils.sql.DataBaseConnector;
+import utils.sql.UserAuthorisation;
 import java.io.*;
 import java.net.*;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.UnresolvedAddressException;
+import java.sql.*;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.Scanner;
 import java.util.Stack;
 import java.lang.*;
 
@@ -16,9 +21,9 @@ import java.lang.*;
  * Server
  */
 
-public class Server {
+public class Server extends Thread{
 
-    private static final Logger logger = LoggerFactory.getLogger(Server.class);
+    private static Logger logger;
 
     private final int PORT;
     private final int PACKET_SIZE = 10000;
@@ -37,10 +42,12 @@ public class Server {
      * @param hostName client to connect to
      */
 
-    public Server(int PORT, String hostName){
+    public Server(int PORT, String hostName) {
         this.PORT = PORT;
         serializer = new Serializer();
         this.hostName = hostName;
+        logger = new LogFactory().getLogger(this);
+
     }
 
     /**
@@ -52,8 +59,9 @@ public class Server {
         logger.info("Server is launched");
         connect(hostName);
         boolean shouldAnswer;
+        String login = authoriseUser();
 
-        loadCollection();
+        loadCollection(login);
         running = true;
         while (running) {
             shouldHandle = true;
@@ -68,7 +76,6 @@ public class Server {
             sendRequest();
 
         }
-        //close();
     }
 
     /**
@@ -112,7 +119,6 @@ public class Server {
         ServerRequest request = null;
         try {
             request = (ServerRequest) serializer.deserialize(packet.getData());
-            //if (request.getCommand().trim().equals("exit"))
             logger.info("Server got a request from " + packet.getAddress().getHostAddress());
         } catch (ClassNotFoundException e) {
             logger.warn("Server got an incorrect request");
@@ -127,16 +133,76 @@ public class Server {
         return request;
     }
 
+    private String authoriseUser(){
+        UserAuthorisation userAuthorisation = new UserAuthorisation(DataBaseConnector.getConnection());
+        UserData userData = null;
+        boolean isLoggedIn = false;
+
+        while (!isLoggedIn){
+
+            try {
+                buf = new byte[PACKET_SIZE];
+                packet = new DatagramPacket(buf, buf.length);
+
+                socket.receive(packet);
+                userData = (UserData) serializer.deserialize(packet.getData());
+                logger.info("Server got an authorisation form from " + packet.getAddress().getHostAddress());
+                isLoggedIn = userAuthorisation.authorise(userData);
+            } catch (ClassNotFoundException e) {
+                logger.warn("Server got an incorrect authorisation form");
+                MessagesForClient.recordMessage("Incorrect request. Send authorisation form");
+
+            } catch (IOException e){
+                logger.error("IO exception");
+                MessagesForClient.recordMessage("IO exception");
+                e.printStackTrace();
+
+            }catch (ClassCastException e){
+                logger.error("Server got an incorrect request");
+                MessagesForClient.recordMessage("Send an authorisation form");
+
+            }finally {
+                sendRequest();
+            }
+
+        }
+        return userData.getLogin();
+    }
+
     /**
      * loads json collection to RequestsHandler
      */
 
-    private void loadCollection(){
-        String collectionPath = ".\\src\\data\\bands.json";
-        CollectionSaver collectionSaver = new CollectionSaver(collectionPath);
-        Stack<MusicBand> bands = collectionSaver.saveFileToCollection();
-        handler = new RequestsHandler(bands, collectionSaver);
-        logger.info("Collection is loaded from " + collectionPath);
+    private void loadCollection(String userName) {
+
+        Stack<MusicBand> bands = new Stack<>();
+        try {
+            Statement st = DataBaseConnector.getConnection().createStatement();
+            ResultSet rs = st.executeQuery("SELECT id, name, x, y, creation_date, number_of_participants, " +
+                    "description, establishment_date, genre, album_name, tracks, length, sales " +
+                    "FROM music_bands WHERE owner=\'"+ userName +"\';");
+            while (rs.next()){
+                long id = rs.getLong("id");
+                String name = rs.getString("name");
+                Coordinates coordinates = new Coordinates(rs.getInt("x"),rs.getInt("y"));
+                Date creationDate = rs.getDate("creation_date");
+                Integer numberOfParticipants = rs.getInt("number_of_participants");
+                String description = rs.getString("description");
+                ZonedDateTime establishmentDate = rs.getTimestamp("establishment_date").toLocalDateTime().atZone(ZoneId.of("+3"));
+                //ZonedDateTime establishmentDate = ZonedDateTime.ofInstant(rs.getTimestamp("establishment_date").toInstant(), ZoneId.of("UTC"));
+                MusicGenre genre = MusicGenre.getEnum(rs.getString("genre"));
+                Album bestAlbum = new Album(rs.getString("album_name"), rs.getInt("tracks"),
+                        rs.getInt("length"), rs.getFloat("sales"));
+                bands.add(new MusicBand(id, name, coordinates, creationDate,
+                        numberOfParticipants, description, establishmentDate, genre, bestAlbum));
+            }
+        }catch (SQLException e){
+            e.printStackTrace();
+            System.exit(1);
+        }
+
+        handler = new RequestsHandler(bands);
+        logger.info("Collection is loaded");
     }
 
     /**
@@ -146,7 +212,7 @@ public class Server {
     private void sendRequest(){
         try {
             InetAddress address = packet.getAddress();
-            logger.warn("Server tries to send a request to " + address.getHostAddress());
+            logger.warn("Server is trying to send a request to " + address.getHostAddress());
             int port = packet.getPort();
             ClientRequest clientRequest = new ClientRequest(MessagesForClient.popMessagesInString());
             byte[] localBuffer = serializer.serialize(clientRequest);
@@ -162,11 +228,21 @@ public class Server {
      * terminates the server
      */
 
-    private void close(){
+    public void waitToGetClosed() {
+
+        Scanner scanner = new Scanner(System.in);
+        String command;
+        System.out.println("Write \'close\' if you want to shutdown the server");
+        while (true){
+            command = scanner.nextLine();
+            if (command.trim().toLowerCase().equals("close")){
+                break;
+            }
+        }
         running = false;
         shouldHandle = false;
         socket.close();
-        //System.out.println("Работа серевера завершена");
+        interrupt();
         logger.info("The server is closed");
     }
 }

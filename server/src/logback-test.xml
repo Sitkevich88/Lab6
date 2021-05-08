@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configuration>
+<configuration debug="true">
   # Console appender
   <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
     <layout class="ch.qos.logback.classic.PatternLayout">
@@ -10,17 +10,21 @@
 
   # File appender
   <appender name="fout" class="ch.qos.logback.core.FileAppender">
-    <file>history.log</file>
-    <append>true</append>
-    <encoder>
-      # Pattern of log message for file appender
-      <pattern>%d{yyyy-MM-dd HH:mm:ss} %-5p %m%n</pattern>
+    <append>false</append>
+    <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+      <layout class="ch.qos.logback.classic.html.HTMLLayout">
+        <pattern>%d{yyyy-MM-dd}%thread%level%msg</pattern>
+      </layout>
     </encoder>
+    <file>history.html</file>
   </appender>
 
 
   <root level="INFO">
     <appender-ref ref="stdout" />
+    <appender-ref ref="fout" />
+  </root>
+  <root level="DEBUG">
     <appender-ref ref="fout" />
   </root>
 </configuration>

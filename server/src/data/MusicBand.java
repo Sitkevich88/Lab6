@@ -1,8 +1,6 @@
 package data;
 
 
-import utils.GeneratorId;
-
 import java.io.Serializable;
 import java.time.ZonedDateTime;
 import java.util.Date;
@@ -48,15 +46,14 @@ public class MusicBand implements Comparable<MusicBand>, Serializable {
     private Album bestAlbum;
 
 
-    public MusicBand(String name, Coordinates coordinates,
+    public MusicBand(long id, String name, Coordinates coordinates, Date creationDate,
                      Integer numberOfParticipants, String description,
                      ZonedDateTime establishmentDate, MusicGenre genre, Album bestAlbum) {
-        //super(name, coordinates, numberOfParticipants, description, establishmentDate, genre, bestAlbum);
-        GeneratorId generatorId = new GeneratorId();
-        this.id = generatorId.generate();
+        
+        this.id = id;
         this.name = name;
         this.coordinates = coordinates;
-        creationDate = new Date();
+        this.creationDate = creationDate;
         this.numberOfParticipants = numberOfParticipants;
         this.description = description;
         this.establishmentDate = establishmentDate;
@@ -64,11 +61,7 @@ public class MusicBand implements Comparable<MusicBand>, Serializable {
         this.bestAlbum = bestAlbum;
     }
 
-    public MusicBand(ProtoMusicBand pBand){
-        this(pBand.getName(), pBand.getCoordinates(),
-                pBand.getNumberOfParticipants(), pBand.getDescription(),
-                pBand.getEstablishmentDate(), pBand.getGenre(), pBand.getBestAlbum());
-    }
+
 
 
     public long getId() {

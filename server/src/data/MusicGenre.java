@@ -8,7 +8,7 @@ import java.util.Arrays;
 
 public enum MusicGenre implements Serializable {
     ROCK ("rock"),
-    PSYCHEDELIC_ROCK ("psychedelic rock"),
+    PSYCHEDELIC_ROCK ("psychedelic_rock"),
     RAP ("rap"),
     HIP_HOP("hip-hop"),
     POP ("pop");

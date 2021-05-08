@@ -2,7 +2,10 @@ package commands.withTwoArguments;
 
 import data.MusicBand;
 import utils.MessagesForClient;
+import utils.sql.DataBaseConnector;
 
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Stack;
 import java.util.stream.Collectors;
 
@@ -15,18 +18,24 @@ public class RemoveGreater {
     /**
      * Executes the command.
      * @param collection - old collection
-     * @param number - int specific index
+     * @param id - long specific id
      * @return updated collection
      */
 
-    public Stack<MusicBand> invoke(Stack<MusicBand> collection, int number) throws IllegalArgumentException{
+    public Stack<MusicBand> invoke(String sender, Stack<MusicBand> collection, long id) throws IllegalArgumentException{
 
         try {
             int initialLength = collection.size();
 
-            collection = collection.stream().
-                    limit(number).
-                    collect(Collectors.toCollection(Stack<MusicBand>::new));
+            try {
+                Statement st = DataBaseConnector.getConnection().createStatement();
+                st.execute("DELETE FROM music_bands WHERE id >= "+id+" AND owner = \'"+sender+"\';");
+                collection = collection.stream().
+                        filter(band->band.getId()>=id).
+                        collect(Collectors.toCollection(Stack<MusicBand>::new));
+            }catch (SQLException e){
+                e.printStackTrace();
+            }
 
             if (initialLength==collection.size()){
                 throw new NullPointerException();

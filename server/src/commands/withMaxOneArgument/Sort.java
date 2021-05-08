@@ -22,11 +22,11 @@ public class Sort {
      * @return sorted collection
      */
 
-    public Stack<MusicBand> invoke(Stack<MusicBand> collection){
+    public void invoke(Stack<MusicBand> collection){
         if (collection==null){
-            return null;
+            return;
         }
-        return collection.stream().
+        collection = collection.stream().
                 sorted().
                 collect(Collectors.toCollection(Stack<MusicBand>::new));
     }

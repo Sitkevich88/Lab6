@@ -15,11 +15,11 @@ public class MusicBandCreator {
     public MusicBand getMusicBandFromScriptInBuffer(){
 
         MusicBand musicBand = null;
-        ProtoMusicBandCreator protoMusicBandCreator = new ProtoMusicBandCreator();
+        /*ProtoMusicBandCreator protoMusicBandCreator = new ProtoMusicBandCreator();
         ProtoMusicBand protoMusicBand = protoMusicBandCreator.getProtoMusicBandFromScriptInBuffer();
         if (protoMusicBand!=null){
             musicBand = new MusicBand(protoMusicBand);
-        }
+        }*/
         return musicBand;
 
     }

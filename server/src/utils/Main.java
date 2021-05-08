@@ -1,5 +1,8 @@
 package utils;
 
+import utils.sql.DataBaseConnector;
+
+
 /**
  * @author Valerii Sitkevich
  */
@@ -7,7 +10,12 @@ package utils;
 
 public class Main {
 
-    public static void main(String[] args) {
-        new Server(19111, "localhost").run();
+    public static void main(String[] args){
+
+        new DataBaseConnector().connect();
+
+        Server server = new Server(19117, "localhost");
+        server.start();
+        server.waitToGetClosed();
     }
 }

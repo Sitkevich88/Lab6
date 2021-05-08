@@ -5,19 +5,20 @@ import commands.withTwoArguments.*;
 import data.MusicBand;
 import data.ServerRequest;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import utils.sql.DataBaseConnector;
+import java.sql.Connection;
 import java.util.Stack;
 
 public class RequestsHandler {
 
-    private static final Logger logger = LoggerFactory.getLogger(RequestsHandler.class);
+    private static Logger logger;
     private Stack<MusicBand> collection;
-    private CollectionSaver collectionSaver;
+    private Connection connection;
 
-    public RequestsHandler(Stack<MusicBand> collection, CollectionSaver collectionSaver) {
+    public RequestsHandler(Stack<MusicBand> collection) {
         this.collection = collection;
-        this.collectionSaver = collectionSaver;
+        connection = DataBaseConnector.getConnection();
+        logger = new LogFactory().getLogger(this);
     }
 
     public boolean handle(ServerRequest request){
@@ -25,39 +26,42 @@ public class RequestsHandler {
         do{
             try {
                 str = CommandsParser.parseArguments(request);
+                String sender = request.getSender();
                 logger.warn("Server is handling \"" + str[0] + "\" command");
                 Sort sorter = new Sort();
-                collection = sorter.invoke(collection);
+                sorter.invoke(collection);
                 switch (str[0]) {
                     case ("help"):
                         new Help();
                         break;
                     case ("info"):
                         Info info = new Info();
-                        info.invoke(collection);
+                        info.invoke(sender, collection);
                         break;
                     case ("show"):
                         new Show(collection);
                         break;
+                    case ("show_all"):
+                        new ShowAll();
+                        break;
                     case ("add"):
                         Add adder = new Add();
-                        collection = adder.updateCollection(collection, request.getBand());
+                        adder.updateCollection(sender, collection, request.getBand());
                         break;
                     case ("clear"):
                         Clear clearer = new Clear();
-                        collection = clearer.invoke(collection);
+                        clearer.invoke(sender, collection);
                         break;
-                /*case ("save"):
-                    new Save(collection, collectionSaver);
-                    break;*/
-                    case ("exit"):
+                    /*case ("save"):
                         new Save(collection, collectionSaver);
+                        break;*/
+                    case ("exit"):
                         CommandsParser.clearBuffer();
                         logger.info("One client has disconnected via \"exit\" command");
                         return false;
                     case ("sort"):
                         Sort sorter1 = new Sort();
-                        collection = sorter1.invoke(collection);
+                        sorter1.invoke(collection);
                         break;
                     case ("sum_of_number_of_participants"):
                         SumOfNumberOfParticipants sum = new SumOfNumberOfParticipants();
@@ -68,28 +72,28 @@ public class RequestsHandler {
                         printer.invoke(collection);
                         break;
                     case ("update"):
-                        long idToUpdate = Long.valueOf(str[1]).longValue();
+                        long idToUpdate = Long.parseLong(str[1]);
                         UpdateId updater = new UpdateId();
-                        collection = updater.invoke(collection, idToUpdate, request.getBand());
+                        updater.invoke(sender, collection, idToUpdate, request.getBand());
                         break;
                     case ("remove_by_id"):
-                        long idToRemove = Long.valueOf(str[1]).longValue();
+                        long idToRemove = Long.parseLong(str[1]);
                         RemoveById remover = new RemoveById();
-                        collection = remover.invoke(collection, idToRemove);
+                        remover.invoke(sender, collection, idToRemove);
                         break;
                     case ("execute_script"):
                         ExecuteScript scriptExecutor = new ExecuteScript(request.getScript());
                         scriptExecutor.execute();
                         break;
-                    case ("insert_at"):
-                        int index = Integer.valueOf(str[1]).intValue();
+                    /*case ("insert_at"):
+                        int index = Integer.parseInt(str[1]);
                         InsertAt insertAt = new InsertAt();
-                        collection = insertAt.invoke(collection, index, request.getBand());
-                        break;
+                        insertAt.invoke(sender, collection, index, request.getBand());
+                        break;*/
                     case ("remove_greater"):
-                        int indexToRemove = Integer.valueOf(str[1]).intValue();
+                        long idToRemoveFrom = Long.parseLong(str[1]);
                         RemoveGreater removeGreater = new RemoveGreater();
-                        collection = removeGreater.invoke(collection, indexToRemove);
+                        collection = removeGreater.invoke(sender, collection, idToRemoveFrom);
                         break;
                     case ("count_greater_than_best_album"):
                         CountGreaterThanBestAlbum countGreaterThanBestAlbum = new CountGreaterThanBestAlbum();
@@ -102,7 +106,7 @@ public class RequestsHandler {
             }catch (IndexOutOfBoundsException | IllegalArgumentException e){
                 MessagesForClient.recordMessage("Incorrect argument");
             }catch (Exception e){
-                MessagesForClient.recordMessage(e.getStackTrace().toString());
+                MessagesForClient.recordMessage(e.getMessage());
             }
         }while (!CommandsParser.isBufferEmpty());
 

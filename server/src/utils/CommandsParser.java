@@ -34,7 +34,7 @@ public class CommandsParser {
                 line = request.getCommand();
                 if (request.getArguments()!=null){
                     for (String argument : request.getArguments()){
-                        line += "\\s" + argument;
+                        line += " " + argument;
                     }
                 }
                 lastMode = ParserMode.REQUEST;
