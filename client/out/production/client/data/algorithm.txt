@@ -1,5 +1,0 @@
-help
-info
-show
-remove_by_id 1
-info
