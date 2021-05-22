@@ -33,9 +33,9 @@ public class RemoveGreater extends AbstractCommandWhichRequiresCollection {
 
             try {
                 Statement st = DataBaseConnector.getConnection().createStatement();
-                st.execute("DELETE FROM music_bands WHERE id >= "+id+" AND owner = \'"+sender+"\';");
+                st.execute("DELETE FROM music_bands WHERE id > "+id+" AND owner = \'"+sender+"\';");
                 setCollection(getCollection().stream().
-                        filter(band->band.getId()>=id).
+                        filter(band->band.getId()<=id && band.getOwner().equals(sender)).
                         collect(Collectors.toCollection(LinkedBlockingQueue::new)));
             }catch (SQLException e){
                 getMessages().recordMessage(e.getMessage());

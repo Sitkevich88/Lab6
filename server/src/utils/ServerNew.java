@@ -1,6 +1,7 @@
 package utils;
 
 
+import commands.withTwoArguments.Add;
 import org.slf4j.Logger;
 import data.*;
 import utils.sql.DataBaseConnector;
@@ -12,6 +13,7 @@ import java.nio.channels.UnresolvedAddressException;
 import java.sql.*;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 import java.lang.*;
 import java.util.concurrent.*;
@@ -95,10 +97,7 @@ public class ServerNew extends Thread{
             socket = channel.socket();
             logger.info("Server has successfully connected");
         }
-        catch (IOException e){
-            logger.error(e.getMessage());
-            System.exit(1);
-        } catch (UnresolvedAddressException e){
+        catch (IOException | UnresolvedAddressException e){
             logger.error(e.getMessage());
             System.exit(1);
         }
@@ -301,7 +300,12 @@ public class ServerNew extends Thread{
             String command;
             System.out.println("Write \'close\' if you want to shut down the server");
             while (true){
-                command = scanner.nextLine();
+                try {
+                    command = scanner.nextLine();
+                }catch (NoSuchElementException | NullPointerException e){
+                    break;
+                }
+
                 if (command.trim().toLowerCase().equals("close")){
                     break;
                 }

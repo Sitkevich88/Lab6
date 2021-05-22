@@ -23,7 +23,7 @@
   <appender name="dbout" class="ch.qos.logback.classic.db.DBAppender">
     <connectionSource class="ch.qos.logback.core.db.DriverManagerConnectionSource">
       <driverClass>org.postgresql.Driver</driverClass>
-      <url>jdbc:postgresql://localhost:5430/studs</url>
+      <url>jdbc:postgresql://pg:5432/studs</url>
       <user>s312693</user>
       <password>uuh591</password>
     </connectionSource>

@@ -2,9 +2,12 @@ package utils.sql;
 
 import org.slf4j.Logger;
 import utils.LogFactory;
+
+import java.io.Console;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 import static java.lang.System.out;
@@ -19,7 +22,8 @@ public class DataBaseConnector {
         try {
             Class.forName("org.postgresql.Driver");
             String ps = readPassword();
-            connection = DriverManager.getConnection("jdbc:postgresql://localhost:5430/studs",
+            //connection = DriverManager.getConnection("jdbc:postgresql://localhost:5430/studs", "s312693", ps);
+            connection = DriverManager.getConnection("jdbc:postgresql://pg:5432/studs",
                     "s312693", ps);
             logger.info("Accessed to database");
         } catch (ClassNotFoundException e) {
@@ -33,18 +37,25 @@ public class DataBaseConnector {
 
     }
 
-    /*
-    public String readPassword(){
+
+   /* public String readPassword(){
         Console console = System.console();
         char[] ch = console.readPassword("Enter db password : ");
+        if (ch==null){System.exit(0);}
         return ch.toString();
     }*/
 
 
     private String readPassword() {
+        String line = null;
         Scanner scanner = new Scanner(System.in);
         out.print("Enter db password: ");
-        return scanner.nextLine();
+        try {
+            line = scanner.nextLine();
+        }catch (NoSuchElementException | NullPointerException e){
+            System.exit(0);
+        }
+        return line;
     }
 
     public static Connection getConnection() {
