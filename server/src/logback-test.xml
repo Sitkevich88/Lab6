@@ -8,21 +8,32 @@
     </layout>
   </appender>
 
-  # File appender
+  # HTML File appender
   <appender name="fout" class="ch.qos.logback.core.FileAppender">
-    <append>false</append>
+    <append>true</append>
     <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
       <layout class="ch.qos.logback.classic.html.HTMLLayout">
-        <pattern>%d{yyyy-MM-dd}%thread%level%msg</pattern>
+        <pattern>%d{MM-dd HH:mm:ss}%thread%level%msg</pattern>
       </layout>
     </encoder>
     <file>history.html</file>
+  </appender>
+
+  # DB appender
+  <appender name="dbout" class="ch.qos.logback.classic.db.DBAppender">
+    <connectionSource class="ch.qos.logback.core.db.DriverManagerConnectionSource">
+      <driverClass>org.postgresql.Driver</driverClass>
+      <url>jdbc:postgresql://localhost:5430/studs</url>
+      <user>s312693</user>
+      <password>uuh591</password>
+    </connectionSource>
   </appender>
 
 
   <root level="INFO">
     <appender-ref ref="stdout" />
     <appender-ref ref="fout" />
+    <appender-ref ref="dbout" />
   </root>
   <root level="DEBUG">
     <appender-ref ref="fout" />

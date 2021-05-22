@@ -1,4 +1,4 @@
-package utils;
+/*package utils;
 
 
 import org.slf4j.Logger;
@@ -17,9 +17,6 @@ import java.util.Stack;
 import java.lang.*;
 
 
-/**
- * Server
- */
 
 public class Server extends Thread{
 
@@ -36,31 +33,26 @@ public class Server extends Thread{
     private boolean shouldHandle;
     private final String hostName;
 
-    /**
-     * Constructor
-     * @param PORT port to listen to
-     * @param hostName client to connect to
-     */
+
 
     public Server(int PORT, String hostName) {
         this.PORT = PORT;
         serializer = new Serializer();
         this.hostName = hostName;
         logger = new LogFactory().getLogger(this);
+        running = true;
 
     }
 
-    /**
-     * runs the server
-     */
 
-    public void run() {
+
+    /*public void run() {
 
         logger.info("Server is launched");
         connect(hostName);
         boolean shouldAnswer;
         String login = authoriseUser();
-
+        OnlineUsers.addUser(login);
         loadCollection(login);
         running = true;
         while (running) {
@@ -78,10 +70,52 @@ public class Server extends Thread{
         }
     }
 
+    public void run() {
+
+        logger.info("Server is launched");
+        connect(hostName);
+        while (running){
+            reactOnRequest(receiveRequest());
+        }
+
+    }
+
+    public void reactOnRequest(Object request){
+        if (request==null){
+            logger.warn("Server is shutdown");
+            System.exit(0);
+        }
+        if (ServerRequest.class.equals(request.getClass())) {
+            ServerRequest serverRequest = (ServerRequest) request;
+            if (OnlineUsers.isUserOnline(serverRequest.getUserData())){
+                boolean shouldAnswer;
+                shouldHandle = true;
+                shouldAnswer = true;
+                if (shouldHandle){
+                    shouldAnswer = handler.handle(serverRequest);
+                }
+                if (!shouldAnswer){
+                    return;
+                }
+            }else{
+                MessagesForClient.recordMessage("You are not authorised");
+            }
+            sendRequest();
+
+        } else if (UserData.class.equals(request.getClass())) {
+            UserAuthorisation userAuthorisation = new UserAuthorisation(DataBaseConnector.getConnection());
+            UserData userData = (UserData) request;
+             if (userAuthorisation.authorise(userData)){
+                 loadCollection(userData.getLogin());
+             }
+             sendRequest();
+        }
+    }
+
     /**
      * connects the server to the client
      * @param hostName client name
-     */
+
 
     private void connect(String hostName){
         try{
@@ -104,25 +138,28 @@ public class Server extends Thread{
     /**
      * receives requests from the client
      * @return ServerRequest
-     */
 
-    private ServerRequest receiveRequest() {
+
+    private /*ServerRequest Object receiveRequest() {
 
         buf = new byte[PACKET_SIZE];
         packet = new DatagramPacket(buf, buf.length);
         try {
             socket.receive(packet);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("IO exception");
+            //e.printStackTrace();
         }
 
-        ServerRequest request = null;
+        //ServerRequest request = null;
+        Object request = null;
         try {
-            request = (ServerRequest) serializer.deserialize(packet.getData());
+            request = /*(ServerRequest) serializer.deserialize(packet.getData());
             logger.info("Server got a request from " + packet.getAddress().getHostAddress());
         } catch (ClassNotFoundException e) {
             logger.warn("Server got an incorrect request");
             MessagesForClient.recordMessage("Incorrect request");
+            System.out.println(request);
             shouldHandle = false;
         } catch (IOException e){
             logger.error("IO exception");
@@ -154,11 +191,11 @@ public class Server extends Thread{
 
             } catch (IOException e){
                 logger.error("IO exception");
-                MessagesForClient.recordMessage("IO exception");
+                MessagesForClient.recordMessage("IO exception while authorising");
                 e.printStackTrace();
 
             }catch (ClassCastException e){
-                logger.error("Server got an incorrect request");
+                logger.warn("Server got an incorrect request");
                 MessagesForClient.recordMessage("Send an authorisation form");
 
             }finally {
@@ -171,17 +208,18 @@ public class Server extends Thread{
 
     /**
      * loads json collection to RequestsHandler
-     */
+
 
     private void loadCollection(String userName) {
 
         Stack<MusicBand> bands = new Stack<>();
         try {
             Statement st = DataBaseConnector.getConnection().createStatement();
-            ResultSet rs = st.executeQuery("SELECT id, name, x, y, creation_date, number_of_participants, " +
+            ResultSet rs = st.executeQuery("SELECT owner, id, name, x, y, creation_date, number_of_participants, " +
                     "description, establishment_date, genre, album_name, tracks, length, sales " +
                     "FROM music_bands WHERE owner=\'"+ userName +"\';");
             while (rs.next()){
+                String owner = rs.getString("owner");
                 long id = rs.getLong("id");
                 String name = rs.getString("name");
                 Coordinates coordinates = new Coordinates(rs.getInt("x"),rs.getInt("y"));
@@ -193,10 +231,11 @@ public class Server extends Thread{
                 MusicGenre genre = MusicGenre.getEnum(rs.getString("genre"));
                 Album bestAlbum = new Album(rs.getString("album_name"), rs.getInt("tracks"),
                         rs.getInt("length"), rs.getFloat("sales"));
-                bands.add(new MusicBand(id, name, coordinates, creationDate,
+                bands.add(new MusicBand(owner, id, name, coordinates, creationDate,
                         numberOfParticipants, description, establishmentDate, genre, bestAlbum));
             }
         }catch (SQLException e){
+            logger.error("Server did not manage to download collection");
             e.printStackTrace();
             System.exit(1);
         }
@@ -207,7 +246,7 @@ public class Server extends Thread{
 
     /**
      * sends all buffered messages from MessagesForClient packed in a request
-     */
+
 
     private void sendRequest(){
         try {
@@ -220,15 +259,15 @@ public class Server extends Thread{
             socket.send(packet);
             logger.info("Request is sent to " + address.getHostAddress());
         } catch (IOException e) {
-            logger.error(e.getStackTrace().toString());
+            logger.error(e.getMessage());
         }
     }
 
     /**
      * terminates the server
-     */
 
-    public void waitToGetClosed() {
+
+    public boolean waitToGetClosed() {
 
         Scanner scanner = new Scanner(System.in);
         String command;
@@ -242,7 +281,8 @@ public class Server extends Thread{
         running = false;
         shouldHandle = false;
         socket.close();
-        interrupt();
+        //interrupt();
         logger.info("The server is closed");
+        return true;
     }
-}
+}*/

@@ -1,7 +1,6 @@
 package commands.withTwoArguments;
 
 
-
 import utils.CommandsParser;
 import utils.MessagesForClient;
 import utils.ParserMode;
@@ -13,18 +12,18 @@ import utils.ParserMode;
 
 public class ExecuteScript {
 
-    private String script = "";
-
-    public ExecuteScript(String script){
-        this.script = script;
+    //private String script = "";
+    private MessagesForClient messages;
+    public ExecuteScript(MessagesForClient messages){
+        this.messages = messages;
     }
 
 
-    public void execute(){
+    public void execute(String script){
         if (CommandsParser.getLastMode().equals(ParserMode.REQUEST)){
             CommandsParser.loadScript(script);
         }else {
-            MessagesForClient.recordMessage("Script path is unreachable");
+            messages.recordMessage("Script path is unreachable");
         }
 
     }

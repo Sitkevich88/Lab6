@@ -7,83 +7,89 @@ import data.ServerRequest;
 import org.slf4j.Logger;
 import utils.sql.DataBaseConnector;
 import java.sql.Connection;
-import java.util.Stack;
+import java.util.concurrent.LinkedBlockingQueue;
 
 public class RequestsHandler {
 
     private static Logger logger;
-    private Stack<MusicBand> collection;
+    private LinkedBlockingQueue<MusicBand> collection;
     private Connection connection;
 
-    public RequestsHandler(Stack<MusicBand> collection) {
+    public RequestsHandler(LinkedBlockingQueue<MusicBand> collection) {
         this.collection = collection;
         connection = DataBaseConnector.getConnection();
         logger = new LogFactory().getLogger(this);
     }
 
-    public boolean handle(ServerRequest request){
+    public synchronized MessagesForClient handle(ServerRequest request){
         String[] str;
+        MessagesForClient messages = new MessagesForClient();
+        CommandsParser.setMessages(messages);
         do{
             try {
                 str = CommandsParser.parseArguments(request);
                 String sender = request.getSender();
                 logger.warn("Server is handling \"" + str[0] + "\" command");
-                Sort sorter = new Sort();
-                sorter.invoke(collection);
+                Sort sorter = new Sort(collection, messages);
+                sorter.invoke();
                 switch (str[0]) {
                     case ("help"):
-                        new Help();
+                        Help help = new Help(messages);
+                        help.invoke();
                         break;
                     case ("info"):
-                        Info info = new Info();
-                        info.invoke(sender, collection);
+                        Info info = new Info(collection, messages);
+                        info.invoke();
                         break;
                     case ("show"):
-                        new Show(collection);
+                        Show show = new Show(collection, messages);
+                        show.invoke(sender);
                         break;
                     case ("show_all"):
-                        new ShowAll();
+                        ShowAll showAll = new ShowAll(collection, messages);
+                        showAll.invoke();
                         break;
                     case ("add"):
-                        Add adder = new Add();
-                        adder.updateCollection(sender, collection, request.getBand());
+                        Add adder = new Add(collection, messages);
+                        adder.updateCollection(sender, request.getBand());
                         break;
                     case ("clear"):
-                        Clear clearer = new Clear();
-                        clearer.invoke(sender, collection);
+                        Clear clearer = new Clear(collection, messages);
+                        clearer.invoke(sender);
                         break;
                     /*case ("save"):
                         new Save(collection, collectionSaver);
                         break;*/
-                    case ("exit"):
+                    /*case ("exit"):
                         CommandsParser.clearBuffer();
                         logger.info("One client has disconnected via \"exit\" command");
-                        return false;
+                        //OnlineUsers.removeUser(sender);
+                        return false;*/
                     case ("sort"):
-                        Sort sorter1 = new Sort();
-                        sorter1.invoke(collection);
+                        Sort sorter1 = new Sort(collection, messages);
+                        sorter1.invoke();
                         break;
                     case ("sum_of_number_of_participants"):
-                        SumOfNumberOfParticipants sum = new SumOfNumberOfParticipants();
-                        sum.print(collection);
+                        SumOfNumberOfParticipants sum = new SumOfNumberOfParticipants(collection, messages);
+                        sum.invoke();
                         break;
                     case ("print_field_ascending_description"):
-                        PrintFieldAscendingDescription printer = new PrintFieldAscendingDescription();
-                        printer.invoke(collection);
+                        PrintFieldAscendingDescription printer = new PrintFieldAscendingDescription(collection, messages);
+                        printer.invoke();
                         break;
                     case ("update"):
                         long idToUpdate = Long.parseLong(str[1]);
-                        UpdateId updater = new UpdateId();
-                        updater.invoke(sender, collection, idToUpdate, request.getBand());
+                        UpdateId updater = new UpdateId(collection, messages);
+                        updater.invoke(sender, idToUpdate, request.getBand());
                         break;
                     case ("remove_by_id"):
                         long idToRemove = Long.parseLong(str[1]);
-                        RemoveById remover = new RemoveById();
-                        remover.invoke(sender, collection, idToRemove);
+                        RemoveById remover = new RemoveById(collection, messages);
+                        remover.invoke(sender, idToRemove);
                         break;
                     case ("execute_script"):
-                        ExecuteScript scriptExecutor = new ExecuteScript(request.getScript());
-                        scriptExecutor.execute();
+                        ExecuteScript scriptExecutor = new ExecuteScript(messages);
+                        scriptExecutor.execute(request.getScript());
                         break;
                     /*case ("insert_at"):
                         int index = Integer.parseInt(str[1]);
@@ -92,25 +98,25 @@ public class RequestsHandler {
                         break;*/
                     case ("remove_greater"):
                         long idToRemoveFrom = Long.parseLong(str[1]);
-                        RemoveGreater removeGreater = new RemoveGreater();
-                        collection = removeGreater.invoke(sender, collection, idToRemoveFrom);
+                        RemoveGreater removeGreater = new RemoveGreater(collection, messages);
+                        collection = removeGreater.invoke(sender, idToRemoveFrom);
                         break;
                     case ("count_greater_than_best_album"):
-                        CountGreaterThanBestAlbum countGreaterThanBestAlbum = new CountGreaterThanBestAlbum();
-                        countGreaterThanBestAlbum.invoke(collection, str[1]);
+                        CountGreaterThanBestAlbum countGreaterThanBestAlbum = new CountGreaterThanBestAlbum(collection, messages);
+                        countGreaterThanBestAlbum.invoke(str[1]);
                         break;
                     default:
                         //System.out.println("Unknown command");
-                        MessagesForClient.recordMessage("Unknown command");
+                        messages.recordMessage("Unknown command");
                 }
             }catch (IndexOutOfBoundsException | IllegalArgumentException e){
-                MessagesForClient.recordMessage("Incorrect argument");
+                messages.recordMessage("Incorrect argument");
             }catch (Exception e){
-                MessagesForClient.recordMessage(e.getMessage());
+                messages.recordMessage(e.getMessage());
             }
         }while (!CommandsParser.isBufferEmpty());
 
-        return true;
+        return messages;
 
     }
 }

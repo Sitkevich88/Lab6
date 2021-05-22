@@ -1,34 +1,31 @@
 package commands.withMaxOneArgument;
 
+import commands.AbstractCommandWhichRequiresCollection;
 import data.MusicBand;
+import utils.MessagesForClient;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
-import java.util.Base64;
-import java.util.Stack;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.stream.Collectors;
 
 /**
  * Command 'sort'. Sorts collection by band name
  */
 
-public class Sort {
+public class Sort extends AbstractCommandWhichRequiresCollection {
 
-    /**
-     *
-     * @param collection - collection to be sorted
-     * @return sorted collection
-     */
+    public Sort(LinkedBlockingQueue<MusicBand> collection, MessagesForClient messages) {
+        super(collection, messages);
+    }
 
-    public void invoke(Stack<MusicBand> collection){
-        if (collection==null){
+
+    public void invoke(){
+        if (getCollection()==null){
             return;
         }
-        collection = collection.stream().
+        //Collections.sort(getCollection());
+        setCollection(getCollection().stream().
                 sorted().
-                collect(Collectors.toCollection(Stack<MusicBand>::new));
+                collect(Collectors.toCollection(LinkedBlockingQueue::new)));
     }
 
 }

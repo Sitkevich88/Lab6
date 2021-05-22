@@ -1,47 +1,47 @@
 package commands.withMaxOneArgument;
 
+import commands.AbstractCommandWhichRequiresCollection;
 import data.MusicBand;
 import utils.MessagesForClient;
 import utils.sql.DataBaseConnector;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Collection;
+import java.sql.Statement;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * Command 'info'. Prints a short piece of information about the collection
  */
 
-public class Info {
+public class Info extends AbstractCommandWhichRequiresCollection {
 
-    /**
-     * Executes the command.
-     * @param collection - collection to examine
-     */
+    public Info(LinkedBlockingQueue<MusicBand> collection, MessagesForClient messages) {
+        super(collection, messages);
+    }
 
-    public void invoke(String sender, Collection<MusicBand> collection){
+    public void invoke(){
         try{
-            MessagesForClient.recordMessage( "Тип коллекции: " + collection.getClass().getSimpleName() +
-                    "\nРазмер коллекции: " + collection.size() +
-                    "\nДата инициализации: " + getLastInit(sender));
+            getMessages().recordMessage( "Тип коллекции: " + getCollection().getClass().getSimpleName() +
+                    "\nРазмер коллекции: " + getCollection().size() +
+                    "\nДата инициализации: " + getLastInit());
 
         }catch (NullPointerException e){
-            MessagesForClient.recordMessage("Тип коллекции: неопределен" +
+            getMessages().recordMessage("Тип коллекции: неопределен" +
                     "\nРазмер коллекции: 0" +
                     "\nДата инициализации: undefined");
         }
     }
-    private String getLastInit(String sender){
+    private String getLastInit(){
         String lastInit = "undefined";
         try {
-            PreparedStatement prst = DataBaseConnector.getConnection().prepareStatement("SELECT creation_date FROM music_bands WHERE owner = ? ORDER BY creation_date  desc LIMIT 1;");
-            prst.setString(1, sender);
-            ResultSet rs = prst.executeQuery();
+            //Statement statement = DataBaseConnector.getConnection().prepareStatement("SELECT creation_date FROM music_bands WHERE owner = ? ORDER BY creation_date  desc LIMIT 1;");
+            Statement statement = DataBaseConnector.getConnection().createStatement();
+            ResultSet rs = statement.executeQuery("SELECT creation_date FROM music_bands ORDER BY creation_date  desc LIMIT 1;");
             rs.next();
             lastInit = rs.getTimestamp(1).toLocalDateTime().toString();
 
         } catch (SQLException throwables) {
-            MessagesForClient.recordMessage(throwables.getMessage());
+            getMessages().recordMessage(throwables.getMessage());
         }
         return lastInit;
     }

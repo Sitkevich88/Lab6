@@ -1,37 +1,31 @@
 package commands.withMaxOneArgument;
 
+import commands.AbstractCommandWhichRequiresCollection;
 import data.MusicBand;
 import utils.MessagesForClient;
-
-import java.util.Collection;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * Command 'sum_of_number_of_participants'. Counts the total amount of participants
  */
 
-public class SumOfNumberOfParticipants {
+public class SumOfNumberOfParticipants extends AbstractCommandWhichRequiresCollection {
 
-    /**
-     * Executes the command but does not print the result.
-     * @param collection - collection to be examined
-     * @return long total amount of participants
-     */
-
-    public long invoke(Collection<MusicBand> collection){
-        if (collection==null){return 0;}
-        return collection.stream().
-                filter(band->band.getNumberOfParticipants()!=null).
-                mapToLong(band->band.getNumberOfParticipants().longValue()).
-                sum();
+    public SumOfNumberOfParticipants(LinkedBlockingQueue<MusicBand> collection, MessagesForClient messages) {
+        super(collection, messages);
     }
 
     /**
-     * Executes the command and prints the result.
-     * @param collection - collection to be examined
+     * Executes the command but does not print the result.
+     *
      */
 
-    public void print(Collection<MusicBand> collection){
-        Long sumOfNumberOfParticipants = invoke(collection);
-        MessagesForClient.recordMessage(sumOfNumberOfParticipants.toString() + " participants in total");
+    public void invoke(){
+        if (getCollection()==null){return;}
+        Long sumOfNumberOfParticipants = getCollection().stream().
+                filter(band->band.getNumberOfParticipants()!=null).
+                mapToLong(band->band.getNumberOfParticipants().longValue()).
+                sum();
+        getMessages().recordMessage(sumOfNumberOfParticipants.toString() + " participants in total");
     }
 }

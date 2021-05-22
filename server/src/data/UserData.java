@@ -36,12 +36,14 @@ public class UserData implements Serializable {
         UserData userData = (UserData) o;
         return mode == userData.mode &&
                 Objects.equals(login, userData.login) &&
-                Objects.equals(password, userData.password);
+                Arrays.equals(password, userData.password);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(mode, login, password);
+        int result = Objects.hash(mode, login);
+        result = 31 * result + Arrays.hashCode(password);
+        return result;
     }
 
     @Override

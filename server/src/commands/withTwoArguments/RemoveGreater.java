@@ -1,49 +1,53 @@
 package commands.withTwoArguments;
 
+import commands.AbstractCommandWhichRequiresCollection;
 import data.MusicBand;
 import utils.MessagesForClient;
 import utils.sql.DataBaseConnector;
-
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Stack;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.stream.Collectors;
 
 /**
  * Command 'remove_greater'. Removes all greater elements in the collection
  */
 
-public class RemoveGreater {
+public class RemoveGreater extends AbstractCommandWhichRequiresCollection {
+
+
+    public RemoveGreater(LinkedBlockingQueue<MusicBand> collection, MessagesForClient messages) {
+        super(collection, messages);
+    }
 
     /**
      * Executes the command.
-     * @param collection - old collection
      * @param id - long specific id
      * @return updated collection
      */
 
-    public Stack<MusicBand> invoke(String sender, Stack<MusicBand> collection, long id) throws IllegalArgumentException{
+    public LinkedBlockingQueue<MusicBand> invoke(String sender, long id) throws IllegalArgumentException{
 
         try {
-            int initialLength = collection.size();
+            int initialLength = getCollection().size();
 
             try {
                 Statement st = DataBaseConnector.getConnection().createStatement();
                 st.execute("DELETE FROM music_bands WHERE id >= "+id+" AND owner = \'"+sender+"\';");
-                collection = collection.stream().
+                setCollection(getCollection().stream().
                         filter(band->band.getId()>=id).
-                        collect(Collectors.toCollection(Stack<MusicBand>::new));
+                        collect(Collectors.toCollection(LinkedBlockingQueue::new)));
             }catch (SQLException e){
-                e.printStackTrace();
+                getMessages().recordMessage(e.getMessage());
             }
 
-            if (initialLength==collection.size()){
+            if (initialLength==getCollection().size()){
                 throw new NullPointerException();
             }
 
         }catch (NullPointerException e){
-            MessagesForClient.recordMessage("Nothing has been removed. This index is out of range.");
+            getMessages().recordMessage("Nothing has been removed. This index is out of range.");
         }
-        return collection;
+        return (LinkedBlockingQueue<MusicBand>) getCollection();
     }
 }

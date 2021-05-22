@@ -14,6 +14,7 @@ public class CommandsParser {
     private static final String ANSI_RESET = "\u001B[0m";
     private static String buffer = "";
     private static ParserMode lastMode = ParserMode.REQUEST;
+    private static MessagesForClient messages;
 
     public static boolean isBufferEmpty(){
         return buffer.length()==0;
@@ -25,6 +26,10 @@ public class CommandsParser {
 
     public static int getBufferSize() {
         return buffer.length();
+    }
+
+    public static void setMessages(MessagesForClient messages1){
+        messages = messages1;
     }
 
     public static String parseLine(ServerRequest request){
@@ -42,7 +47,7 @@ public class CommandsParser {
                 String[] lines = buffer.split("\\r?\\n",2);
                 line = lines[0];
                 buffer = lines[1];
-                MessagesForClient.recordMessage(ANSI_GREEN + line + ANSI_RESET);
+                messages.recordMessage(ANSI_GREEN + line + ANSI_RESET);
                 lastMode = ParserMode.SCRIPT;
             }
         }catch (NullPointerException e){}
@@ -57,7 +62,7 @@ public class CommandsParser {
             line = lines[0];
             buffer = lines[1];
             lastMode = ParserMode.SCRIPT;
-            MessagesForClient.recordMessage(ANSI_GREEN + line + ANSI_RESET);
+            messages.recordMessage(ANSI_GREEN + line + ANSI_RESET);
         }catch (NullPointerException e){}
         return line;
     }

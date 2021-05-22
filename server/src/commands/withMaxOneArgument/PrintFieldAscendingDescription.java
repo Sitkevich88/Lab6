@@ -1,29 +1,29 @@
 package commands.withMaxOneArgument;
 
+import commands.AbstractCommandWhichRequiresCollection;
 import data.MusicBand;
 import utils.MessagesForClient;
-
-import java.util.Collection;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * Command 'print_field_ascending_description'. Prints all descriptions in ascending alphabetical order
  */
 
-public class PrintFieldAscendingDescription {
+public class PrintFieldAscendingDescription extends AbstractCommandWhichRequiresCollection {
 
-    /**
-     * Executes the command.
-     * @param collection - collection to examine
-     */
+    public PrintFieldAscendingDescription(LinkedBlockingQueue<MusicBand> collection, MessagesForClient messages) {
+        super(collection, messages);
+    }
 
-    public void invoke(Collection<MusicBand> collection){
+
+    public void invoke(){
 
         try {
-            collection.stream().
+            getCollection().stream().
                     map(MusicBand::getDescription).
                     filter(description->description!=null && description.length()!=0).
                     sorted().
-                    forEach(MessagesForClient::recordMessage);
+                    forEach(getMessages()::recordMessage);
         }catch (NullPointerException e){ }
     }
 

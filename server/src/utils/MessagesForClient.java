@@ -4,17 +4,17 @@ import java.util.ArrayList;
 
 public class MessagesForClient {
 
-    private static ArrayList<String> messages = new ArrayList<>();
+    private ArrayList<String> messages = new ArrayList<>();
 
-    public static ArrayList<String> peekMessages(){return  messages;}
+    public ArrayList<String> peekMessages(){return  messages;}
 
-    public static ArrayList<String> popMessages(){
+    public ArrayList<String> popMessages(){
         ArrayList<String> savedMessages = messages;
         messages.clear();
         return savedMessages;
     }
 
-    public static String popMessagesInString(){
+    public String popMessagesInString(){
         StringBuilder allMessages = new StringBuilder();
         for (String m : messages){
             allMessages.append(m + '\n');
@@ -29,10 +29,10 @@ public class MessagesForClient {
         return allMessages.toString();
     }
 
-    public static void recordMessage(String newMessage){
+    public void recordMessage(String newMessage){
         messages.add(newMessage);
     }
-    public static void appendLastMessage(String str){
+    public void appendLastMessage(String str){
         String lastMessage = messages.get(messages.size()-1);
         messages.remove(messages.size()-1);
         messages.add(lastMessage + str);

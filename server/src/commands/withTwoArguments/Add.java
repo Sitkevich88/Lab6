@@ -1,48 +1,50 @@
 package commands.withTwoArguments;
 
 
+import commands.AbstractCommandWhichRequiresCollection;
 import data.*;
 import utils.CommandsParser;
 import utils.MessagesForClient;
-import utils.MusicBandCreator;
 import utils.ProtoMusicBandCreator;
 import utils.sql.DataBaseConnector;
-
 import java.sql.*;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.Stack;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * Command 'add'. Adds a new element to the collection.
  */
 
-public class Add {
+public class Add extends AbstractCommandWhichRequiresCollection {
+
+    public Add(LinkedBlockingQueue<MusicBand> collection, MessagesForClient messages) {
+        super(collection, messages);
+    }
 
     /**
      * Executes the command.
-     * @param collection - old collection
-     * @return Collection. Updated collection with newly added element.
+     *
      */
 
-    public void updateCollection(String sender, Stack<MusicBand> collection, ProtoMusicBand protoBand){
+    public void updateCollection(String sender, ProtoMusicBand protoBand){
         MusicBand band = null;
 
         if (CommandsParser.isBufferEmpty()){
             band = convertProtoMusicBandToMusicBand(sender, protoBand);
         }else {
             ProtoMusicBandCreator protoMusicBandCreator = new ProtoMusicBandCreator();
-            ProtoMusicBand protoMusicBand = protoMusicBandCreator.getProtoMusicBandFromScriptInBuffer();
+            ProtoMusicBand protoMusicBand = protoMusicBandCreator.getProtoMusicBandFromScriptInBuffer(getMessages());
             if (protoMusicBand!=null){
                 band = convertProtoMusicBandToMusicBand(sender, protoMusicBand);
             }
         }
 
-        if (collection==null){
-            collection = new Stack<>();
+        if (getCollection()==null){
+            setCollection(new LinkedBlockingQueue<>());
         }
         if (band!=null){
-            collection.add(band);
+            getCollection().add(band);
         }
 
     }
@@ -84,11 +86,11 @@ public class Add {
             MusicGenre genre = MusicGenre.getEnum(rs.getString("genre"));
             Album bestAlbum = new Album(rs.getString("album_name"), rs.getInt("tracks"),
                     rs.getInt("length"), rs.getFloat("sales"));
-            band = new MusicBand(id, name, coordinates, creationDate,
+            band = new MusicBand(sender, id, name, coordinates, creationDate,
                     numberOfParticipants, description, establishmentDate, genre, bestAlbum);
 
         }catch (SQLException e){
-            MessagesForClient.recordMessage(e.getMessage());
+            getMessages().recordMessage(e.getMessage());
         }finally {
             return band;
         }

@@ -26,14 +26,14 @@ public enum MusicGenre implements Serializable {
     /**
      * Prints all enum values
      */
-    public static void printAllValues(){
+    public static void printAllValues(MessagesForClient messages){
 
         //MessagesForClient.recordMessage("\u001B[34m");
         for (MusicGenre genre : MusicGenre.values()){
 
-            MessagesForClient.recordMessage(  "\u001B[34m" + genre.getTitle() );
+            messages.recordMessage(  "\u001B[34m" + genre.getTitle() );
         }
-        MessagesForClient.appendLastMessage("\u001B[0m");
+        messages.appendLastMessage("\u001B[0m");
     }
 
     /**

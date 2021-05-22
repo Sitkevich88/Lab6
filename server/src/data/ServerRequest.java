@@ -6,33 +6,33 @@ import java.util.Objects;
 
 public class ServerRequest implements Serializable {
 
-    private String sender;
+    private UserData userData;
     private String command;
     private String[] arguments = null;
     private ProtoMusicBand band = null;
     private String script = null;
 
-    public ServerRequest(String sender, String command){
-        this.sender = sender;
+    public ServerRequest(UserData userData, String command){
+        this.userData = userData;
         this.command = command;
     }
 
-    public ServerRequest(String sender, String command, String[] arguments){
-        this(sender, command);
+    public ServerRequest(UserData userData, String command, String[] arguments){
+        this(userData, command);
         this.arguments = arguments;
     }
-    public ServerRequest(String sender, String command, String[] arguments, ProtoMusicBand band){
-        this(sender, command, arguments);
+    public ServerRequest(UserData userData, String command, String[] arguments, ProtoMusicBand band){
+        this(userData, command, arguments);
         this.band = band;
     }
 
-    public ServerRequest(String sender, String command, ProtoMusicBand band){
-        this(sender, command);
+    public ServerRequest(UserData userData, String command, ProtoMusicBand band){
+        this(userData, command);
         this.band = band;
     }
 
-    public ServerRequest (String sender, String command, String script){
-        this(sender, command);
+    public ServerRequest (UserData userData, String command, String script){
+        this(userData, command);
         this.script = script;
     }
 
@@ -53,7 +53,11 @@ public class ServerRequest implements Serializable {
     }
 
     public String getSender() {
-        return sender;
+        return userData.getLogin();
+    }
+
+    public UserData getUserData() {
+        return userData;
     }
 
     @Override
@@ -61,7 +65,7 @@ public class ServerRequest implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ServerRequest that = (ServerRequest) o;
-        return sender.equals(that.sender) &&
+        return userData.equals(that.userData) &&
                 command.equals(that.command) &&
                 Arrays.equals(arguments, that.arguments) &&
                 Objects.equals(band, that.band) &&
@@ -70,7 +74,7 @@ public class ServerRequest implements Serializable {
 
     @Override
     public int hashCode() {
-        int result = Objects.hash(sender, command, band, script);
+        int result = Objects.hash(userData, command, band, script);
         result = 31 * result + Arrays.hashCode(arguments);
         return result;
     }
@@ -78,7 +82,7 @@ public class ServerRequest implements Serializable {
     @Override
     public String toString() {
         return "ServerRequest{" +
-                "sender='" + sender + '\'' +
+                "userData=" + userData +
                 ", command='" + command + '\'' +
                 ", arguments=" + Arrays.toString(arguments) +
                 ", band=" + band +

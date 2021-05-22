@@ -21,35 +21,37 @@ public class MusicBand implements Comparable<MusicBand>, Serializable {
      */
     private Coordinates coordinates;
     /**
-     * The field cannot be null, The field value is generated automatically
+     * This field cannot be null, The field value is generated automatically
      */
     private Date creationDate;
     /**
-     * The field can be null, The field value must be greater than 0
+     * This field can be null, The value must be greater than 0
      */
     private Integer numberOfParticipants;
     /**
-     * The field can be null
+     * This field can be null
      */
     private String description;
     /**
-     * The field cannot be null
+     * This field cannot be null
      */
     private ZonedDateTime establishmentDate;
     /**
-     * The field cannot be null
+     * This field cannot be null
      */
     private MusicGenre genre;
     /**
-     * The field cannot be null
+     * This field cannot be null
      */
     private Album bestAlbum;
 
+    private String owner;
 
-    public MusicBand(long id, String name, Coordinates coordinates, Date creationDate,
+
+    public MusicBand(String owner, long id, String name, Coordinates coordinates, Date creationDate,
                      Integer numberOfParticipants, String description,
                      ZonedDateTime establishmentDate, MusicGenre genre, Album bestAlbum) {
-        
+        this.owner = owner;
         this.id = id;
         this.name = name;
         this.coordinates = coordinates;
@@ -62,7 +64,9 @@ public class MusicBand implements Comparable<MusicBand>, Serializable {
     }
 
 
-
+    public String getOwner() {
+        return owner;
+    }
 
     public long getId() {
         return id;
@@ -138,18 +142,8 @@ public class MusicBand implements Comparable<MusicBand>, Serializable {
 
     @Override
     public String toString() {
-        /*return "\n\tMusic band{" +
-                "\n\t\tid = " + id +
-                ",\n\t\tname = " + name +
-                ",\n\t\tcoordinates = " + coordinates +
-                ",\n\t\tcreation date = " + creationDate +
-                ",\n\t\tnumber of participants = " + numberOfParticipants +
-                ",\n\t\tdescription = " + description +
-                ",\n\t\testablishment date = " + establishmentDate +
-                ",\n\t\tgenre = " + genre +
-                ",\n\t\tbest album = " + bestAlbum +
-                "\n\t}\n";*/
         return "\n\t" + name +" - music band{" +
+                "\n\t\towner = " + owner +
                 "\n\t\tid = " + id +
                 ",\n\t\tcoordinates = " + coordinates +
                 ",\n\t\tcreation date = " + creationDate +
@@ -174,11 +168,12 @@ public class MusicBand implements Comparable<MusicBand>, Serializable {
                 Objects.equals(description, musicBand.description) &&
                 Objects.equals(establishmentDate, musicBand.establishmentDate) &&
                 genre == musicBand.genre &&
-                Objects.equals(bestAlbum, musicBand.bestAlbum);
+                Objects.equals(bestAlbum, musicBand.bestAlbum) &&
+                Objects.equals(owner, musicBand.owner);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, coordinates, creationDate, numberOfParticipants, description, establishmentDate, genre, bestAlbum);
+        return Objects.hash(id, name, coordinates, creationDate, numberOfParticipants, description, establishmentDate, genre, bestAlbum, owner);
     }
 }
