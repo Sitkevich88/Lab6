@@ -27,6 +27,7 @@ public class Client {
     private SocketAddress serverAddress;
     private final int PORT;
     private int PACKET_SIZE = 10000;
+    private final int TIMEOUT = 10*1000;
     private byte[] buf = new byte[PACKET_SIZE];
     private ByteBuffer buffer;
     private boolean running;
@@ -98,7 +99,7 @@ public class Client {
             try {
                 selector = Selector.open();
                 key = channel.register(selector, SelectionKey.OP_READ);
-                selector.select(5000);
+                selector.select(TIMEOUT);
                 channel.receive(buffer);
                 buffer.flip();
                 ClientRequest clientRequest = (ClientRequest) serializer.deserialize(buffer.array());
@@ -177,7 +178,7 @@ public class Client {
         try {
             selector = Selector.open();
             key = channel.register(selector, SelectionKey.OP_READ);
-            selector.select(5000);
+            selector.select(TIMEOUT);
             channel.receive(buffer);
             buffer.flip();
             ClientRequest clientRequest = (ClientRequest) serializer.deserialize(buffer.array());

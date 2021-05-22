@@ -15,4 +15,3 @@ My kids will not miss
 execute_script .\src\data\script.txt
 info
 execute_script .\src\data\script.txt
-exit
