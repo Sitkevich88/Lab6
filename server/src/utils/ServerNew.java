@@ -104,7 +104,7 @@ public class ServerNew extends Thread{
     }
 
     /**
-     * loads json collection to RequestsHandler
+     * loads collection to RequestsHandler
      */
 
     private void loadCollection() {
@@ -144,13 +144,6 @@ public class ServerNew extends Thread{
     /**
      * receives requests from the client
      */
-
-    /*private int priority = 0;
-    private AtomicBoolean canGoOn = new AtomicBoolean(true);*/
-
-
-    //private final Object lock = new Object();
-    //private volatile int threadNumber = 1;
     
     private Thread receiveRequest() {
         /*if (canGoOn.get()==false){return;};*/
@@ -159,7 +152,7 @@ public class ServerNew extends Thread{
 
         }*/
 
-        /*synchronized (lock){*/
+       
         Thread receiver = new Thread(()->{
             shouldHandle = true;
             buf = new byte[PACKET_SIZE];
@@ -193,12 +186,9 @@ public class ServerNew extends Thread{
                 } catch (NullPointerException e){
                     interrupt();
                 }
-                //threadNumber++;
             }
         });
         receiver.setName("Receiver");
-        /*receiver.setPriority(++priority);*/
-        //threadNumber--;
         receiver.start();
         return receiver;
     }
@@ -241,8 +231,7 @@ public class ServerNew extends Thread{
                 messages = userAuthorisation.authorise(userData, messages);
             }
             try {
-                //System.out.println("Handler пытается написать адрес пакета");
-                //System.out.println(packets.get(0).getAddress());
+               
                 requestExchangerBetweenHandlerAndSender.put(messages);
             } catch (InterruptedException e) {
                 logger.error(e.getMessage());
@@ -263,14 +252,10 @@ public class ServerNew extends Thread{
                 //DatagramPacket packet = requestExchangerBetweenHandlerAndSender.take();
                 MessagesForClient messages = requestExchangerBetweenHandlerAndSender.take();
                 logger.warn("Server is trying to send a request to " + packet.getAddress().getHostAddress());
-                //System.out.println("Я warn'ул");
                 ClientRequest clientRequest = new ClientRequest(messages.popMessagesInString());
                 byte[] localBuffer = serializer.serialize(clientRequest);
                 packet = new DatagramPacket(localBuffer, localBuffer.length, packet.getAddress(), packet.getPort());
-                //System.out.println("Ещё жив");
                 socket.send(packet);
-                //System.out.println("отправил");
-                //localSocket.send(packet);
                 logger.info("Request is sent to " + packet.getAddress().getHostAddress());
             } catch (InterruptedException e) {
                 logger.warn("Sender is interrupted");
