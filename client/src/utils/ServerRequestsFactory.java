@@ -2,6 +2,7 @@ package utils;
 
 
 import data.ServerRequest;
+import data.UserData;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -10,7 +11,7 @@ import java.io.IOException;
 
 public class ServerRequestsFactory {
 
-    private String username;
+    private UserData userData;
 
     public ServerRequest getRequestFromConsole() {
         ServerRequest request = null;
@@ -29,29 +30,28 @@ public class ServerRequestsFactory {
                     case ("sum_of_number_of_participants"):
                     case ("clear"):
                     case ("print_field_ascending_description"):
-                        request = new ServerRequest(username, str[0]);
+                        request = new ServerRequest(userData, str[0]);
                         running = false;
                         break;
                     case ("add"):
                         ProtoMusicBandWithCorrectFieldsCreator pBandCreator = new ProtoMusicBandWithCorrectFieldsCreator();
-                        request = new ServerRequest(username, str[0],pBandCreator.createProtoMusicBand());
+                        request = new ServerRequest(userData, str[0],pBandCreator.createProtoMusicBand());
                         running = false;
                         break;
                     case ("update"):
                         ProtoMusicBandWithCorrectFieldsCreator pBandCreator2 = new ProtoMusicBandWithCorrectFieldsCreator();
-                        request = new ServerRequest(username, str[0], new String[]{str[1]},pBandCreator2.createProtoMusicBand());
+                        request = new ServerRequest(userData, str[0], new String[]{str[1]},pBandCreator2.createProtoMusicBand());
                         running = false;
                         break;
                     case ("remove_by_id"):
-                    //case ("insert_at"):
                     case ("remove_greater"):
                     case ("count_greater_than_best_album"):
-                        request = new ServerRequest(username, str[0], new String[]{str[1]});
+                        request = new ServerRequest(userData, str[0], new String[]{str[1]});
                         running = false;
                         break;
                     case ("execute_script"):
                         String script = readScript(str[1]);
-                        request = new ServerRequest(username, str[0], script);
+                        request = new ServerRequest(userData, str[0], script);
                         running = false;
                         break;
                     default:
@@ -90,8 +90,8 @@ public class ServerRequestsFactory {
         return script;
     }
 
-    public void addUsername(String username){
-        this.username = username;
+    public void addUserData(UserData userData){
+        this.userData = userData;
     }
 
 }

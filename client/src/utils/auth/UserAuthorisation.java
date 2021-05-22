@@ -8,7 +8,6 @@ import static java.lang.System.out;
 
 public class UserAuthorisation{
 
-
     private final Hash hasher;
 
     public UserAuthorisation(){

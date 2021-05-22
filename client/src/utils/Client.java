@@ -66,8 +66,8 @@ public class Client {
 
         boolean connected = connect();
         if (connected){
-            String username = authorise();
-            requestsFactory.addUsername(username);
+            UserData userData = authorise();
+            requestsFactory.addUserData(userData);
             while (running){
                 shouldReceive = true;
                 sendRequest();
@@ -82,7 +82,7 @@ public class Client {
         close();
     }
 
-    private String authorise(){
+    private UserData authorise(){
         UserData userData = null;
         buffer = null;
         boolean successful = false;
@@ -98,7 +98,7 @@ public class Client {
             try {
                 selector = Selector.open();
                 key = channel.register(selector, SelectionKey.OP_READ);
-                selector.select(3000);
+                selector.select(5000);
                 channel.receive(buffer);
                 buffer.flip();
                 ClientRequest clientRequest = (ClientRequest) serializer.deserialize(buffer.array());
@@ -109,6 +109,7 @@ public class Client {
                     }
                 }
             } catch (IOException e) {
+                //e.printStackTrace();
                 System.out.println("Server is not responding. Send your authorisation form later");
 
             } catch (ClassNotFoundException e) {
@@ -117,7 +118,7 @@ public class Client {
                 System.exit(0);
             }
         }
-        return userData.getLogin();
+        return userData;
     }
 
     /**
@@ -176,7 +177,7 @@ public class Client {
         try {
             selector = Selector.open();
             key = channel.register(selector, SelectionKey.OP_READ);
-            selector.select(3000);
+            selector.select(5000);
             channel.receive(buffer);
             buffer.flip();
             ClientRequest clientRequest = (ClientRequest) serializer.deserialize(buffer.array());
