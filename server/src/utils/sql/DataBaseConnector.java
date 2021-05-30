@@ -2,14 +2,12 @@ package utils.sql;
 
 import org.slf4j.Logger;
 import utils.LogFactory;
-
 import java.io.Console;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
-
 import static java.lang.System.out;
 
 public class DataBaseConnector {
