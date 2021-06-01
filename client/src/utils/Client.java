@@ -27,7 +27,7 @@ public class Client {
     private SocketAddress serverAddress;
     private final int PORT;
     private int PACKET_SIZE = 10000;
-    private final int TIMEOUT = 10*1000;
+    private final int TIMEOUT = 10000*1000;
     private byte[] buf = new byte[PACKET_SIZE];
     private ByteBuffer buffer;
     private boolean running;
@@ -68,7 +68,7 @@ public class Client {
         boolean connected = connect();
         if (connected){
             UserData userData = authorise();
-            requestsFactory.addUserData(userData);
+            requestsFactory.setUserData(userData);
             while (running){
                 shouldReceive = true;
                 sendRequest();
@@ -110,9 +110,7 @@ public class Client {
                     }
                 }
             } catch (IOException e) {
-                //e.printStackTrace();
                 System.out.println("Server is not responding. Send your authorisation form later");
-
             } catch (ClassNotFoundException e) {
                 System.out.println("Client received an unreadable request");
             }catch (NullPointerException e){
@@ -148,7 +146,9 @@ public class Client {
      */
 
     public void sendRequest() {
+
         ServerRequest request = requestsFactory.getRequestFromConsole();
+
         if (request.getCommand().equals("exit")){
             running = false;
         } else if (request.getScript()!=null && request.getScript().length()>0){
@@ -182,9 +182,14 @@ public class Client {
             channel.receive(buffer);
             buffer.flip();
             ClientRequest clientRequest = (ClientRequest) serializer.deserialize(buffer.array());
+            requestsFactory.setMicroRequest(clientRequest);
             if (clientRequest.getMessages()!=null && clientRequest.getMessages().length()>0){
-                System.out.println(clientRequest.getMessages());
-
+                String messages = clientRequest.getMessages();
+                System.out.println(messages);
+                if (messages.contains("not authorised")){
+                    UserData userData = authorise();
+                    requestsFactory.setUserData(userData);
+                }
             }
         } catch (IOException e) {
             System.out.println("Server is not responding. Send new request later");
