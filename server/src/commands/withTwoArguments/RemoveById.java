@@ -25,33 +25,37 @@ public class RemoveById extends AbstractCommandWhichRequiresCollection {
      * @param id - specific id
      */
 
-    public void invoke(String sender, long id){
+    public LinkedBlockingQueue invoke(String sender, long id){
 
-        int initialLength;
+        int initialLength = 0;
+        String bandName = "";
         try{
             initialLength = getCollection().size();
             try {
                 Statement st = DataBaseConnector.getConnection().createStatement();
                 st.execute("DELETE FROM music_bands WHERE id = "+id+" AND owner = \'"+sender+"\';");
-
+                bandName = getCollection().stream().filter(band->band.getId()==id).
+                        map(band->band.getName()).collect(Collectors.joining());
+                setCollection(getCollection().
+                        stream().
+                        filter(band->band.getId()!=id).
+                        collect(Collectors.toCollection(LinkedBlockingQueue::new)));
             }catch (SQLException e){
                 getMessages().recordMessage(e.getMessage());
             }
-            setCollection(getCollection().
-                    stream().
-                    filter(band->band.getId()!=id).
-                    collect(Collectors.toCollection(LinkedBlockingQueue::new)));
         }catch (NullPointerException e){
             warnIdDoesNotExist();
-            return;
         }
 
         if (initialLength==getCollection().size()){
             warnIdDoesNotExist();
+        } else {
+            getMessages().recordMessage(bandName + " has been removed");
         }
 
+        return (LinkedBlockingQueue) getCollection();
     }
     private void warnIdDoesNotExist(){
-        getMessages().recordMessage("This id does not exist");
+        getMessages().recordMessage("This id does not exist in your collection");
     }
 }

@@ -36,6 +36,7 @@ public class UpdateId extends AbstractCommandWhichRequiresCollection {
 
 
         boolean idFound = false;
+        String bandName = "";
 
         if (getCollection()==null){
             return;
@@ -46,6 +47,7 @@ public class UpdateId extends AbstractCommandWhichRequiresCollection {
             if (band.getId()==id && band.getOwner().equals(sender)){
 
                 idFound = true;
+                bandName = band.getName();
 
                 if (!CommandsParser.isBufferEmpty()){
                     ProtoMusicBandCreator protoMusicBandCreator = new ProtoMusicBandCreator();
@@ -90,6 +92,8 @@ public class UpdateId extends AbstractCommandWhichRequiresCollection {
         }
         if (!idFound){
             getMessages().recordMessage("This id has not been found in your collection");
+        } else {
+            getMessages().recordMessage(bandName + " has been updated");
         }
 
     }

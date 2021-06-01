@@ -10,7 +10,10 @@ import utils.sql.DataBaseConnector;
 import java.sql.*;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.stream.Collectors;
 
 /**
  * Command 'add'. Adds a new element to the collection.
@@ -28,6 +31,7 @@ public class Add extends AbstractCommandWhichRequiresCollection {
      */
 
     public void updateCollection(String sender, ProtoMusicBand protoBand){
+
         MusicBand band = null;
 
         if (CommandsParser.isBufferEmpty()){
@@ -43,9 +47,7 @@ public class Add extends AbstractCommandWhichRequiresCollection {
         if (getCollection()==null){
             setCollection(new LinkedBlockingQueue<>());
         }
-        if (band!=null){
-            getCollection().add(band);
-        }
+        addMusicBand(band);
 
     }
 
@@ -71,21 +73,31 @@ public class Add extends AbstractCommandWhichRequiresCollection {
             prst.executeUpdate();
 
             Statement st = DataBaseConnector.getConnection().createStatement();
-            ResultSet rs = st.executeQuery("SELECT id, name, x, y, creation_date, number_of_participants, " +
-                    "description, establishment_date, genre, album_name, tracks, length, sales " +
+            ResultSet rs = st.executeQuery("SELECT id, creation_date " +
                     "FROM music_bands WHERE owner=\'"+ sender +"\';");
-            rs.next();
-            long id = rs.getLong("id");
-            String name = rs.getString("name");
-            Coordinates coordinates = new Coordinates(rs.getInt("x"),rs.getInt("y"));
+
+            ArrayList<Long> ids = new ArrayList<>();
+            getCollection().stream().mapToLong(b->b.getId()).map(Long::valueOf).
+                    forEach(b1->ids.add(b1));
+            long id = 0;
+
+            while (rs.next()){
+                id = rs.getLong("id");
+                if (!ids.contains(id)){
+                    break;
+                }
+            }
+
+            /*long id = rs.getLong("id");*/
+            String name = protoBand.getName();
+            Coordinates coordinates = protoBand.getCoordinates();
             Date creationDate = rs.getDate("creation_date");
-            Integer numberOfParticipants = rs.getInt("number_of_participants");
-            String description = rs.getString("description");
-            ZonedDateTime establishmentDate = rs.getTimestamp("establishment_date").toLocalDateTime().atZone(ZoneId.of("+3"));
+            Integer numberOfParticipants = protoBand.getNumberOfParticipants();
+            String description = protoBand.getDescription();
+            ZonedDateTime establishmentDate = protoBand.getEstablishmentDate();
             //ZonedDateTime establishmentDate = ZonedDateTime.ofInstant(rs.getTimestamp("establishment_date").toInstant(), ZoneId.of("UTC"));
-            MusicGenre genre = MusicGenre.getEnum(rs.getString("genre"));
-            Album bestAlbum = new Album(rs.getString("album_name"), rs.getInt("tracks"),
-                    rs.getInt("length"), rs.getFloat("sales"));
+            MusicGenre genre = protoBand.getGenre();
+            Album bestAlbum = protoBand.getBestAlbum();
             band = new MusicBand(sender, id, name, coordinates, creationDate,
                     numberOfParticipants, description, establishmentDate, genre, bestAlbum);
 
@@ -96,4 +108,11 @@ public class Add extends AbstractCommandWhichRequiresCollection {
         }
     }
 
+    private void addMusicBand(MusicBand band){
+
+        if (band!=null){
+            getCollection().add(band);
+            getMessages().recordMessage(  "\'" + band.getName() + "\' has been added to your collection");
+        }
+    }
 }

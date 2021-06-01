@@ -20,7 +20,7 @@ public class UserAuthorisation{
         this.connection = connection;
     }
 
-    public MessagesForClient authorise(UserData userData, MessagesForClient messages){
+    public MessagesForClient authorise(UserData userData, MessagesForClient messages, int userPort){
         //if (userData==null){return false;}
         this.username = userData.getLogin();
         this.password = userData.getPassword();
@@ -37,7 +37,7 @@ public class UserAuthorisation{
         }
         //System.out.println("Удалось авторизтроваться - " + commandIsAccomplishedSuccessfully);
         LogFactory logFactory = new LogFactory();
-        logFactory.getLogger(this).info("User got access - " + commandIsAccomplishedSuccessfully);
+        logFactory.getLogger(this).info("user " + userPort + " got access to " + username + " account - " + commandIsAccomplishedSuccessfully);
         if (commandIsAccomplishedSuccessfully){
             OnlineUsers.addUser(userData);
         }

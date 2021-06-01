@@ -18,14 +18,16 @@ public class Sort extends AbstractCommandWhichRequiresCollection {
     }
 
 
-    public void invoke(){
+    public LinkedBlockingQueue invoke(){
         if (getCollection()==null){
-            return;
+            return new LinkedBlockingQueue();
         }
         //Collections.sort(getCollection());
         setCollection(getCollection().stream().
                 sorted().
                 collect(Collectors.toCollection(LinkedBlockingQueue::new)));
+        getMessages().recordMessage("The whole collection has been sorted by name");
+        return (LinkedBlockingQueue) getCollection();
     }
 
 }

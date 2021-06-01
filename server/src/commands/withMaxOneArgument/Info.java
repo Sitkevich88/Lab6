@@ -21,14 +21,14 @@ public class Info extends AbstractCommandWhichRequiresCollection {
 
     public void invoke(){
         try{
-            getMessages().recordMessage( "Тип коллекции: " + getCollection().getClass().getSimpleName() +
-                    "\nРазмер коллекции: " + getCollection().size() +
-                    "\nДата инициализации: " + getLastInit());
+            getMessages().recordMessage( "Collection type: " + getCollection().getClass().getSimpleName() +
+                    "\nCollection size: " + getCollection().size() +
+                    "\nInitialization date: " + getLastInit());
 
         }catch (NullPointerException e){
-            getMessages().recordMessage("Тип коллекции: неопределен" +
-                    "\nРазмер коллекции: 0" +
-                    "\nДата инициализации: undefined");
+            getMessages().recordMessage("Collection type: undefined" +
+                    "\nCollection size: 0" +
+                    "\nInitialization date: undefined");
         }
     }
     private String getLastInit(){

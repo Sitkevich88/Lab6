@@ -5,6 +5,8 @@ import java.util.ArrayList;
 public class MessagesForClient {
 
     private ArrayList<String> messages = new ArrayList<>();
+    private boolean checkResult = false;
+    private String sender;
 
     public ArrayList<String> peekMessages(){return  messages;}
 
@@ -36,5 +38,21 @@ public class MessagesForClient {
         String lastMessage = messages.get(messages.size()-1);
         messages.remove(messages.size()-1);
         messages.add(lastMessage + str);
+    }
+
+    public boolean isCheckResult() {
+        return checkResult;
+    }
+
+    public void setCheckResult(boolean checkResult) {
+        this.checkResult = checkResult;
+    }
+
+    public String getSender() {
+        return sender;
+    }
+
+    public void setSender(String sender) {
+        this.sender = sender;
     }
 }

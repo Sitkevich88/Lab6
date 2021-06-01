@@ -27,7 +27,7 @@ public class Clear extends AbstractCommandWhichRequiresCollection {
                 Statement st = DataBaseConnector.getConnection().createStatement();
                 st.execute("DELETE FROM music_bands WHERE owner = \'"+ sender + "\';");
                 getCollection().removeIf(musicBand -> musicBand.getOwner().equals(sender));
-                //collection.clear();
+                getMessages().recordMessage("Now your collection is empty");
             } catch (SQLException e) {
                 getMessages().recordMessage(e.getMessage());
             }

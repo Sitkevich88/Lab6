@@ -1,8 +1,8 @@
 package utils.sql;
 
+import org.postgresql.util.PSQLException;
 import org.slf4j.Logger;
 import utils.LogFactory;
-import java.io.Console;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -16,21 +16,31 @@ public class DataBaseConnector {
 
     public void connect(){
         LogFactory logFactory = new LogFactory();
-        Logger logger = logFactory.getLogger(this);
+        Logger logger = null;
         try {
+            logger = logFactory.getLogger(this);
             Class.forName("org.postgresql.Driver");
             String ps = readPassword();
             //connection = DriverManager.getConnection("jdbc:postgresql://localhost:5430/studs", "s312693", ps);
-            connection = DriverManager.getConnection("jdbc:postgresql://pg:5432/studs",
-                    "s312693", ps);
+            connection = DriverManager.getConnection("jdbc:postgresql://pg:5432/studs", "s312693", ps);
             logger.info("Accessed to database");
         } catch (ClassNotFoundException e) {
             logger.error("Postgresql Driver has not been found");
             System.exit(1);
-        } catch (SQLException throwables) {
+        } catch (PSQLException e){
+            out.println("Ошибка при попытке подсоединения");
+            System.exit(1);
+        }
+        catch (SQLException throwables) {
             logger.error("Incorrect password or database is currently unavailable");
-            out.println(throwables.getMessage());
+            throwables.printStackTrace();
             System.exit(0);
+        } catch (IllegalStateException e){
+            out.println(e.getMessage());
+            System.exit(1);
+        } catch (Exception e){
+            out.println(e.getMessage());
+            System.exit(1);
         }
 
     }

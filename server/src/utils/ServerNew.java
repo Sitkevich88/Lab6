@@ -1,7 +1,6 @@
 package utils;
 
 
-import commands.withTwoArguments.Add;
 import org.slf4j.Logger;
 import data.*;
 import utils.sql.DataBaseConnector;
@@ -63,9 +62,6 @@ public class ServerNew extends Thread{
      * runs the server
      */
 
-
-    private Thread t;
-
     public void run() {
 
         logger.info("Server is launched");
@@ -73,13 +69,13 @@ public class ServerNew extends Thread{
         loadCollection();
         waitToGetClosed();
         do{
-            t = receiveRequest();
+            Thread t = receiveRequest();
             handleRequest();
             Future f = sendRequest();
             //while (t.isAlive()){}
             while (!f.isDone()){}
         }while (running);
-
+        System.exit(0);
     }
 
 
@@ -142,17 +138,12 @@ public class ServerNew extends Thread{
     }
 
     /**
-     * receives requests from the client
+     * receives requests from a client
      */
+
     
     private Thread receiveRequest() {
-        /*if (canGoOn.get()==false){return;};*/
-        /*Object lock = new Object();*/
-        /*while (threadNumber<=0){
 
-        }*/
-
-       
         Thread receiver = new Thread(()->{
             shouldHandle = true;
             buf = new byte[PACKET_SIZE];
@@ -167,7 +158,7 @@ public class ServerNew extends Thread{
             Object request = null;
             try {
                 request = serializer.deserialize(packet.getData());
-                logger.info("Server got a request from " + packet.getAddress().getHostAddress());
+                logger.info("Server got a request from user " + packet.getPort());
             } catch (ClassNotFoundException e) {
                 logger.warn("Server got an incorrect request");
                 //TODO MessagesForClient.recordMessage("Incorrect request");
@@ -228,10 +219,9 @@ public class ServerNew extends Thread{
             } else if (request instanceof UserData) {
                 UserAuthorisation userAuthorisation = new UserAuthorisation(DataBaseConnector.getConnection());
                 UserData userData = (UserData) request;
-                messages = userAuthorisation.authorise(userData, messages);
+                messages = userAuthorisation.authorise(userData, messages, packet.getPort());
             }
             try {
-               
                 requestExchangerBetweenHandlerAndSender.put(messages);
             } catch (InterruptedException e) {
                 logger.error(e.getMessage());
@@ -248,15 +238,15 @@ public class ServerNew extends Thread{
     private Future sendRequest(){
         Future<Boolean> future = responseSender.submit(() -> {
             try {
-                
-                //DatagramPacket packet = requestExchangerBetweenHandlerAndSender.take();
+
                 MessagesForClient messages = requestExchangerBetweenHandlerAndSender.take();
-                logger.warn("Server is trying to send a request to " + packet.getAddress().getHostAddress());
+                logger.warn("Server is trying to send a request to user " + packet.getPort());
                 ClientRequest clientRequest = new ClientRequest(messages.popMessagesInString());
+                clientRequest.setResult(messages.isCheckResult());
                 byte[] localBuffer = serializer.serialize(clientRequest);
                 packet = new DatagramPacket(localBuffer, localBuffer.length, packet.getAddress(), packet.getPort());
                 socket.send(packet);
-                logger.info("Request is sent to " + packet.getAddress().getHostAddress());
+                logger.info("Request is sent to user " + packet.getPort());
             } catch (InterruptedException e) {
                 logger.warn("Sender is interrupted");
                 interrupt();
@@ -273,11 +263,11 @@ public class ServerNew extends Thread{
      * terminates the server
      */
 
-    public boolean waitToGetClosed() {
+    public void waitToGetClosed() {
 
         Thread closer = new Thread(()->{
             try {
-                this.sleep(500);
+                sleep(500);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -303,6 +293,5 @@ public class ServerNew extends Thread{
             responseSender.shutdownNow();
         });
         closer.start();
-        return true;
     }
 }

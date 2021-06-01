@@ -13,11 +13,9 @@ public class RequestsHandler {
 
     private static Logger logger;
     private LinkedBlockingQueue<MusicBand> collection;
-    private Connection connection;
 
     public RequestsHandler(LinkedBlockingQueue<MusicBand> collection) {
         this.collection = collection;
-        connection = DataBaseConnector.getConnection();
         logger = new LogFactory().getLogger(this);
     }
 
@@ -27,11 +25,18 @@ public class RequestsHandler {
         CommandsParser.setMessages(messages);
         do{
             try {
+                //System.out.println(request.getCommand());
                 str = CommandsParser.parseArguments(request);
                 String sender = request.getSender();
-                logger.warn("Server is handling \"" + str[0] + "\" command");
-                Sort sorter = new Sort(collection, messages);
-                sorter.invoke();
+                messages.setSender(sender);
+                String wholeCommand = "";
+                for (String word : str){
+                    wholeCommand += word +" ";
+                }
+                if (wholeCommand.length()>0){wholeCommand = wholeCommand.substring(0, wholeCommand.length()-1);}
+                logger.warn("Server is handling \"" + wholeCommand + "\" command for " + request.getSender() + " account");
+                /*Sort sorter = new Sort(collection, messages);
+                sorter.invoke();*/
                 switch (str[0]) {
                     case ("help"):
                         Help help = new Help(messages);
@@ -60,14 +65,14 @@ public class RequestsHandler {
                     /*case ("save"):
                         new Save(collection, collectionSaver);
                         break;*/
-                    /*case ("exit"):
+                    case ("exit"):
                         CommandsParser.clearBuffer();
                         logger.info("One client has disconnected via \"exit\" command");
-                        //OnlineUsers.removeUser(sender);
-                        return false;*/
+                        OnlineUsers.removeUser(request.getUserData());
+                        break;
                     case ("sort"):
                         Sort sorter1 = new Sort(collection, messages);
-                        sorter1.invoke();
+                        collection = sorter1.invoke();
                         break;
                     case ("sum_of_number_of_participants"):
                         SumOfNumberOfParticipants sum = new SumOfNumberOfParticipants(collection, messages);
@@ -85,7 +90,7 @@ public class RequestsHandler {
                     case ("remove_by_id"):
                         long idToRemove = Long.parseLong(str[1]);
                         RemoveById remover = new RemoveById(collection, messages);
-                        remover.invoke(sender, idToRemove);
+                        collection = remover.invoke(sender, idToRemove);
                         break;
                     case ("execute_script"):
                         ExecuteScript scriptExecutor = new ExecuteScript(messages);
@@ -104,6 +109,11 @@ public class RequestsHandler {
                     case ("count_greater_than_best_album"):
                         CountGreaterThanBestAlbum countGreaterThanBestAlbum = new CountGreaterThanBestAlbum(collection, messages);
                         countGreaterThanBestAlbum.invoke(str[1]);
+                        break;
+                    case ("check_id"):
+                        long idToCheck = Long.parseLong(str[1]);
+                        CheckId idChecker = new CheckId(collection, messages);
+                        idChecker.invoke(sender, idToCheck);
                         break;
                     default:
                         //System.out.println("Unknown command");

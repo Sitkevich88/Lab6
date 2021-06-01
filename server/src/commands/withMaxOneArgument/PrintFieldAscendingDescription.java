@@ -19,11 +19,12 @@ public class PrintFieldAscendingDescription extends AbstractCommandWhichRequires
     public void invoke(){
 
         try {
-            getCollection().stream().
+            long counter = getCollection().stream().
                     map(MusicBand::getDescription).
                     filter(description->description!=null && description.length()!=0).
                     sorted().
-                    forEach(getMessages()::recordMessage);
+                    peek(getMessages()::recordMessage).count();
+            getMessages().recordMessage(counter + " descriptions in total");
         }catch (NullPointerException e){ }
     }
 

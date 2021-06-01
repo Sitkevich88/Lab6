@@ -10,7 +10,8 @@ public class Hash {
         try {
             digester = MessageDigest.getInstance("SHA-256");
         } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
+            System.out.println("Incorrect hash algorithm");
+            System.exit(1);
         }
         return digester.digest(line.getBytes());
     }

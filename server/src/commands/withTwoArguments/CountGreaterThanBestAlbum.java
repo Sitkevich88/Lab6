@@ -33,6 +33,6 @@ public class CountGreaterThanBestAlbum extends AbstractCommandWhichRequiresColle
                     peek(p-> getMessages().recordMessage(p.getBestAlbum().getName())).
                     count();
         }
-        getMessages().recordMessage(counter + " albums are greater");
+        getMessages().recordMessage(counter + " albums are greater in the whole collection");
     }
 }
