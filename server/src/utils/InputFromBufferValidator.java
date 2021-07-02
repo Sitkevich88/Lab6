@@ -1,6 +1,9 @@
 package utils;
 
+import data.ClientRequest;
+import data.MessageFromServerToClient;
 import data.MusicGenre;
+
 import java.time.*;
 import java.util.InputMismatchException;
 
@@ -10,11 +13,12 @@ import java.util.InputMismatchException;
 
 public class InputFromBufferValidator {
 
-    private MessagesForClient messages;
+    private ClientRequest clientRequest;
     
-    public InputFromBufferValidator(MessagesForClient messages){
-        this.messages = messages;
+    public InputFromBufferValidator(ClientRequest clientRequest){
+        this.clientRequest = clientRequest;
     }
+
 
     /**
      * Validates String
@@ -28,7 +32,7 @@ public class InputFromBufferValidator {
         String correctString;
         do {
             hasBufferLineToRead();
-            messages.recordMessage(msg);
+            //messages.recordMessage(msg);
             correctString = CommandsParser.getBufferLine();
 
         }while (!(emptyCheck(canBeEmpty, correctString) && nullCheck(canBeNull, correctString)));
@@ -53,7 +57,7 @@ public class InputFromBufferValidator {
         while (!correct){
             try {
                 hasBufferLineToRead();
-                messages.recordMessage(msg);
+                //messages.recordMessage(msg);
                 buffer = CommandsParser.getBufferLine().trim();
                 if (buffer.length()==0){
                     throw new InputMismatchException();
@@ -85,7 +89,7 @@ public class InputFromBufferValidator {
             while (!isInteger){
                 try {
                     hasBufferLineToRead();
-                    messages.recordMessage(msg);
+                    //messages.recordMessage(msg);
                     buffer = CommandsParser.getBufferLine().trim();
                     correctInt = Integer.valueOf(buffer);
                     isInteger = true;
@@ -111,8 +115,8 @@ public class InputFromBufferValidator {
         boolean correct = false;
         while (!correct){
             hasBufferLineToRead();
-            messages.recordMessage(msg);
-            MusicGenre.printAllValues(messages);
+            //messages.recordMessage(msg);
+            //MusicGenre.printAllValues(messages);
             String input = CommandsParser.getBufferLine().trim();
             try {
                 genre = MusicGenre.getEnum(input);
@@ -137,7 +141,7 @@ public class InputFromBufferValidator {
         while (!correct){
             try {
                 hasBufferLineToRead();
-                messages.recordMessage("The format is year.month.day (2021.02.22)");
+                //messages.recordMessage("The format is year.month.day (2021.02.22)");
                 String[] input = CommandsParser.getBufferLine().trim().split("\\.", 3);
                 localDate = LocalDate.of(Integer.valueOf(input[0]).intValue(), Integer.valueOf(input[1]).intValue(), Integer.valueOf(input[2]).intValue());
                 correct = true;
@@ -150,7 +154,7 @@ public class InputFromBufferValidator {
         while (!correct){
             try {
                 hasBufferLineToRead();
-                messages.recordMessage("Insert the offset in the format +/- and a number of hours in range[-18, +18] (+3): ");
+                //messages.recordMessage("Insert the offset in the format +/- and a number of hours in range[-18, +18] (+3): ");
                 zoneId = ZoneId.of(CommandsParser.getBufferLine().trim());
                 correct = true;
             }catch (DateTimeException e){
@@ -178,7 +182,7 @@ public class InputFromBufferValidator {
             while (!isFloat){
                 try {
                     hasBufferLineToRead();
-                    messages.recordMessage(msg);
+                    //messages.recordMessage(msg);
                     buffer = CommandsParser.getBufferLine().trim();
                     correctFloat = Float.valueOf(buffer);
                     isFloat = true;
@@ -199,7 +203,7 @@ public class InputFromBufferValidator {
         if (!canBeNull){
             try{
                 if (input.equals("null")){
-                    messages.recordMessage("Input cannot be null");
+                    //messages.recordMessage("Input cannot be null");
                     return false;
                 }
             }catch (NullPointerException e){
@@ -215,7 +219,7 @@ public class InputFromBufferValidator {
         if (!canBeEmpty){
 
             if (input.length()==0){
-                messages.recordMessage("Input cannot be empty");
+                //messages.recordMessage("Input cannot be empty");
                 return false;
             }
 
@@ -231,42 +235,42 @@ public class InputFromBufferValidator {
             switch (input.getClass().getSimpleName()){
                 case ("Byte"):
                     if (input.byteValue()<=0){
-                        messages.recordMessage("Input must be positive");
+                        //messages.recordMessage("Input must be positive");
                         return false;
                     }
                     break;
                 case ("Double"):
                     if (input.doubleValue()<=0){
-                        messages.recordMessage("Input must be positive");
+                        //messages.recordMessage("Input must be positive");
                         return false;
                     }
                     break;
                 case ("Float"):
                     if (input.floatValue()<=0){
-                        messages.recordMessage("Input must be positive");
+                        //messages.recordMessage("Input must be positive");
                         return false;
                     }
                     break;
                 case ("Integer"):
                     if (input.intValue()<=0){
-                        messages.recordMessage("Input must be positive");
+                        //messages.recordMessage("Input must be positive");
                         return false;
                     }
                     break;
                 case ("Long"):
                     if (input.longValue()<=0){
-                        messages.recordMessage("Input must be positive");
+                        //messages.recordMessage("Input must be positive");
                         return false;
                     }
                     break;
                 case ("Short"):
                     if (input.shortValue()<=0){
-                        messages.recordMessage("Input must be positive");
+                        //messages.recordMessage("Input must be positive");
                         return false;
                     }
                     break;
                 default:
-                    messages.recordMessage("Unexpected Number value");
+                    //messages.recordMessage("Unexpected Number value");
                     return false;
             }
         }

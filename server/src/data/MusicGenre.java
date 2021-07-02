@@ -1,7 +1,5 @@
 package data;
 
-import utils.MessagesForClient;
-
 import java.io.Serializable;
 import java.util.Arrays;
 
@@ -15,6 +13,8 @@ public enum MusicGenre implements Serializable {
 
     private final String title;
 
+    public static final long serialVersionUID = 5000L;
+
     MusicGenre(String title) {
         this.title = title.toLowerCase();
     }
@@ -23,18 +23,6 @@ public enum MusicGenre implements Serializable {
         return title;
     }
 
-    /**
-     * Prints all enum values
-     */
-    public static void printAllValues(MessagesForClient messages){
-
-        //MessagesForClient.recordMessage("\u001B[34m");
-        for (MusicGenre genre : MusicGenre.values()){
-
-            messages.recordMessage(  "\u001B[34m" + genre.getTitle() );
-        }
-        messages.appendLastMessage("\u001B[0m");
-    }
 
     /**
      *

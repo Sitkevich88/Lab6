@@ -8,6 +8,8 @@ import java.util.Objects;
 
 public class MusicBand implements Comparable<MusicBand>, Serializable {
 
+    public static final long serialVersionUID = 4000L;
+
     /**
      * The field value must be greater than 0, The field value must be unique, The field value is generated automatically
      */
@@ -63,82 +65,90 @@ public class MusicBand implements Comparable<MusicBand>, Serializable {
         this.bestAlbum = bestAlbum;
     }
 
-
-    public String getOwner() {
-        return owner;
+    public int compareTo(MusicBand musicBand){
+        return name.compareTo(musicBand.getName());
     }
 
     public long getId() {
         return id;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public Coordinates getCoordinates() {
-        return coordinates;
-    }
-
-    public Date getCreationDate() {
-        return creationDate;
-    }
-
-    public Integer getNumberOfParticipants() {
-        return numberOfParticipants;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public ZonedDateTime getEstablishmentDate() {
-        return establishmentDate;
-    }
-
-    public MusicGenre getGenre() {
-        return genre;
-    }
-
-    public Album getBestAlbum() {
-        return bestAlbum;
-    }
-
     public void setId(long id) {
         this.id = id;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public void setName(String name) {
         this.name = name;
     }
 
+    public Coordinates getCoordinates() {
+        return coordinates;
+    }
+
     public void setCoordinates(Coordinates coordinates) {
         this.coordinates = coordinates;
+    }
+
+    public Date getCreationDate() {
+        return creationDate;
+    }
+
+    public void setCreationDate(Date creationDate) {
+        this.creationDate = creationDate;
+    }
+
+    public Integer getNumberOfParticipants() {
+        return numberOfParticipants;
     }
 
     public void setNumberOfParticipants(Integer numberOfParticipants) {
         this.numberOfParticipants = numberOfParticipants;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public ZonedDateTime getEstablishmentDate() {
+        return establishmentDate;
     }
 
     public void setEstablishmentDate(ZonedDateTime establishmentDate) {
         this.establishmentDate = establishmentDate;
     }
 
+    public MusicGenre getGenre() {
+        return genre;
+    }
+
     public void setGenre(MusicGenre genre) {
         this.genre = genre;
+    }
+
+    public Album getBestAlbum() {
+        return bestAlbum;
     }
 
     public void setBestAlbum(Album bestAlbum) {
         this.bestAlbum = bestAlbum;
     }
 
-    public int compareTo(MusicBand musicBand){
-        return name.compareTo(musicBand.getName());
+    public String getOwner() {
+        return owner;
     }
+
+    public void setOwner(String owner) {
+        this.owner = owner;
+    }
+
 
     @Override
     public String toString() {

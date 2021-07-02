@@ -1,5 +1,6 @@
 package utils.sql;
 
+import data.AuthorisationResult;
 import data.UserData;
 import utils.LogFactory;
 import utils.MessagesForClient;
@@ -12,25 +13,26 @@ import java.sql.SQLException;
 
 public class UserAuthorisation{
 
-    private final Connection connection;;
+    private final Connection connection;
     private String username;
     private byte[] password;
+    private AuthorisationResult res = AuthorisationResult.OK;
 
     public UserAuthorisation(Connection connection){
         this.connection = connection;
     }
 
-    public MessagesForClient authorise(UserData userData, MessagesForClient messages, int userPort){
+    public AuthorisationResult authorise(UserData userData, int userPort){
         //if (userData==null){return false;}
         this.username = userData.getLogin();
         this.password = userData.getPassword();
         boolean commandIsAccomplishedSuccessfully;
         switch (userData.getMode()){
-            case CREATE:
-                commandIsAccomplishedSuccessfully = createUser(messages);
+            case SIGN_UP:
+                commandIsAccomplishedSuccessfully = createUser();
                 break;
-            case LOG_IN:
-                commandIsAccomplishedSuccessfully = connectToUser(messages);
+            case SIGN_IN:
+                commandIsAccomplishedSuccessfully = connectToUser();
                 break;
             default:
                 commandIsAccomplishedSuccessfully = false;
@@ -39,12 +41,12 @@ public class UserAuthorisation{
         LogFactory logFactory = new LogFactory();
         logFactory.getLogger(this).info("user " + userPort + " got access to " + username + " account - " + commandIsAccomplishedSuccessfully);
         if (commandIsAccomplishedSuccessfully){
-            OnlineUsers.addUser(userData);
+            OnlineUsers.addAccount(userData);
         }
-        return messages;
+        return res;
     }
 
-    private boolean connectToUser(MessagesForClient messages) {
+    private boolean connectToUser() {
 
         try {
             PreparedStatement prst = connection.prepareStatement("SELECT COUNT(*) FROM auth WHERE login = ? AND password =? LIMIT 1;");
@@ -53,33 +55,38 @@ public class UserAuthorisation{
             ResultSet rs = prst.executeQuery();
             rs.next();
             if (rs.getInt(1)==1){
-                messages.recordMessage("You have successfully logged in");
+                //messages.recordMessage("You have successfully logged in");
+                res = AuthorisationResult.OK;
                 return true;
             }else {
-                messages.recordMessage("Incorrect login or password");
+                res = AuthorisationResult.SIGN_IN_ERROR;
+                //messages.recordMessage("Incorrect login or password");
                 return false;
             }
         } catch (SQLException throwables) {
-            messages.recordMessage(throwables.getMessage());
+
+            //messages.recordMessage(throwables.getMessage());
             return false;
         }
     }
 
-    private boolean createUser(MessagesForClient messages){
+    private boolean createUser(){
 
         try {
             PreparedStatement prst = connection.prepareStatement("INSERT INTO auth(login, password) VALUES (?,?);");
             prst.setString(1, username);
             prst.setBytes(2,password);
             prst.executeUpdate();
-            messages.recordMessage("Successful registration. You have logged in");
+            res = AuthorisationResult.OK;
+            //messages.recordMessage("Successful registration. You have logged in");
             return true;
         } catch (SQLException throwables) {
 
             if (throwables.getLocalizedMessage().contains("duplicate key value")){
-                messages.recordMessage("This login already exists.");
+                //messages.recordMessage("This login already exists.");
+                res = AuthorisationResult.SIGN_UP_ERROR;
             }else {
-                messages.recordMessage(throwables.getMessage());
+                //messages.recordMessage(throwables.getMessage());
             }
 
             return false;

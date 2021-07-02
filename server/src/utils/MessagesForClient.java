@@ -34,6 +34,7 @@ public class MessagesForClient {
     public void recordMessage(String newMessage){
         messages.add(newMessage);
     }
+
     public void appendLastMessage(String str){
         String lastMessage = messages.get(messages.size()-1);
         messages.remove(messages.size()-1);
@@ -55,4 +56,5 @@ public class MessagesForClient {
     public void setSender(String sender) {
         this.sender = sender;
     }
+
 }

@@ -1,18 +1,19 @@
 package commands;
 
+import data.ClientRequest;
+import data.MessageFromServerToClient;
 import data.MusicBand;
-import utils.MessagesForClient;
 import java.util.AbstractCollection;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public abstract class AbstractCommandWhichRequiresCollection {
 
     private LinkedBlockingQueue<MusicBand> collection;
-    private MessagesForClient messages;
+    private ClientRequest request;
 
-    public AbstractCommandWhichRequiresCollection(LinkedBlockingQueue<MusicBand> collection, MessagesForClient messages) {
+    public AbstractCommandWhichRequiresCollection(LinkedBlockingQueue<MusicBand> collection, ClientRequest request) {
         this.collection = collection;
-        this.messages = messages;
+        this.request = request;
     }
 
     public AbstractCollection<MusicBand> getCollection() {
@@ -23,7 +24,7 @@ public abstract class AbstractCommandWhichRequiresCollection {
         this.collection = collection;
     }
 
-    public MessagesForClient getMessages() {
-        return messages;
+    public ClientRequest getClientRequest() {
+        return request;
     }
 }

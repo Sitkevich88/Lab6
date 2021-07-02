@@ -4,6 +4,9 @@ import java.io.Serializable;
 import java.util.Objects;
 
 public class Coordinates implements Serializable {
+
+    public static final long serialVersionUID = 3000L;
+
     private long x;
     private Integer y;
     /**
@@ -28,6 +31,14 @@ public class Coordinates implements Serializable {
      */
     public Integer getY() {
         return y;
+    }
+
+    public void setX(long x) {
+        this.x = x;
+    }
+
+    public void setY(Integer y) {
+        this.y = y;
     }
 
     @Override

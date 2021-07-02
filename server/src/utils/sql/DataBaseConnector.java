@@ -8,6 +8,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
+
 import static java.lang.System.out;
 
 public class DataBaseConnector {
@@ -21,8 +22,8 @@ public class DataBaseConnector {
             logger = logFactory.getLogger(this);
             Class.forName("org.postgresql.Driver");
             String ps = readPassword();
-            //connection = DriverManager.getConnection("jdbc:postgresql://localhost:5430/studs", "s312693", ps);
-            connection = DriverManager.getConnection("jdbc:postgresql://pg:5432/studs", "s312693", ps);
+            connection = DriverManager.getConnection("jdbc:postgresql://localhost:5430/studs", "s312693", ps);
+            //connection = DriverManager.getConnection("jdbc:postgresql://pg:5432/studs", "s312693", ps);
             logger.info("Accessed to database");
         } catch (ClassNotFoundException e) {
             logger.error("Postgresql Driver has not been found");

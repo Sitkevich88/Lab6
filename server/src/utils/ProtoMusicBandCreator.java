@@ -1,6 +1,7 @@
 package utils;
 
 import data.*;
+
 import java.time.ZonedDateTime;
 
 public class ProtoMusicBandCreator {
@@ -12,10 +13,10 @@ public class ProtoMusicBandCreator {
      * @return MusicBand new band
      */
 
-    public ProtoMusicBand getProtoMusicBandFromScriptInBuffer(MessagesForClient messages){
+    public ProtoMusicBand getProtoMusicBandFromScriptInBuffer(ClientRequest clientRequest){
 
 
-        InputFromBufferValidator checker = new InputFromBufferValidator(messages);
+        InputFromBufferValidator checker = new InputFromBufferValidator(clientRequest);
 
         try {
             String name = checker.nextLine("Insert the name: ",false, false);
@@ -35,7 +36,8 @@ public class ProtoMusicBandCreator {
 
             return pBand;
         }catch (EmptyBufferException e){
-            messages.recordMessage("Script contains a MusicBand field which cannot be parsed");
+            //messages.recordMessage("Script contains a MusicBand field which cannot be parsed");
+            clientRequest.setMessage(MessageFromServerToClient.ERROR);
             return null;
         }
 

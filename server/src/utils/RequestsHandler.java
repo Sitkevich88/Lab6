@@ -1,132 +1,126 @@
 package utils;
 
-import commands.withMaxOneArgument.*;
-import commands.withTwoArguments.*;
+
+import commands.withMessage.*;
+import commands.withUpdate.*;
+import data.ClientRequest;
+import data.MessageFromServerToClient;
 import data.MusicBand;
 import data.ServerRequest;
 import org.slf4j.Logger;
-import utils.sql.DataBaseConnector;
-import java.sql.Connection;
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.stream.Collectors;
 
 public class RequestsHandler {
 
     private static Logger logger;
     private LinkedBlockingQueue<MusicBand> collection;
+    private LinkedList<ClientRequest> queue = new LinkedList<>();
 
     public RequestsHandler(LinkedBlockingQueue<MusicBand> collection) {
         this.collection = collection;
         logger = new LogFactory().getLogger(this);
     }
 
-    public synchronized MessagesForClient handle(ServerRequest request){
+    public synchronized LinkedList<ClientRequest> handle(ServerRequest request){
         String[] str;
-        MessagesForClient messages = new MessagesForClient();
-        CommandsParser.setMessages(messages);
+        ClientRequest clientRequest = new ClientRequest();
+        //CommandsParser.setClientRequest(clientRequest);
+        /*if (queue.size()>0){
+            return queue.poll();
+        }*/
         do{
             try {
+                clientRequest = new ClientRequest();
                 //System.out.println(request.getCommand());
                 str = CommandsParser.parseArguments(request);
                 String sender = request.getSender();
-                messages.setSender(sender);
+                //messages.setSender(sender);
                 String wholeCommand = "";
                 for (String word : str){
                     wholeCommand += word +" ";
                 }
                 if (wholeCommand.length()>0){wholeCommand = wholeCommand.substring(0, wholeCommand.length()-1);}
-                logger.warn("Server is handling \"" + wholeCommand + "\" command for " + request.getSender() + " account");
+                logger.warn("Server is handling \"" + wholeCommand + "\" command for \"" + request.getSender() + "\" account");
                 /*Sort sorter = new Sort(collection, messages);
                 sorter.invoke();*/
                 switch (str[0]) {
-                    case ("help"):
-                        Help help = new Help(messages);
-                        help.invoke();
-                        break;
+
                     case ("info"):
-                        Info info = new Info(collection, messages);
+                        Info info = new Info(collection, clientRequest);
                         info.invoke();
                         break;
-                    case ("show"):
-                        Show show = new Show(collection, messages);
-                        show.invoke(sender);
-                        break;
-                    case ("show_all"):
-                        ShowAll showAll = new ShowAll(collection, messages);
-                        showAll.invoke();
-                        break;
                     case ("add"):
-                        Add adder = new Add(collection, messages);
-                        adder.updateCollection(sender, request.getBand());
+                        Add adder = new Add(collection, clientRequest);
+                        adder.updateCollection(sender, request.getBand(), clientRequest);
                         break;
                     case ("clear"):
-                        Clear clearer = new Clear(collection, messages);
+                        Clear clearer = new Clear(collection, clientRequest);
                         clearer.invoke(sender);
                         break;
-                    /*case ("save"):
-                        new Save(collection, collectionSaver);
-                        break;*/
                     case ("exit"):
                         CommandsParser.clearBuffer();
                         logger.info("One client has disconnected via \"exit\" command");
-                        OnlineUsers.removeUser(request.getUserData());
-                        break;
-                    case ("sort"):
-                        Sort sorter1 = new Sort(collection, messages);
-                        collection = sorter1.invoke();
+                        OnlineUsers.removeAccount(request.getUserData());
                         break;
                     case ("sum_of_number_of_participants"):
-                        SumOfNumberOfParticipants sum = new SumOfNumberOfParticipants(collection, messages);
+                        SumOfNumberOfParticipants sum = new SumOfNumberOfParticipants(collection, clientRequest);
                         sum.invoke();
                         break;
                     case ("print_field_ascending_description"):
-                        PrintFieldAscendingDescription printer = new PrintFieldAscendingDescription(collection, messages);
+                        PrintFieldAscendingDescription printer = new PrintFieldAscendingDescription(collection, clientRequest);
                         printer.invoke();
                         break;
                     case ("update"):
                         long idToUpdate = Long.parseLong(str[1]);
-                        UpdateId updater = new UpdateId(collection, messages);
+                        UpdateId updater = new UpdateId(collection, clientRequest);
                         updater.invoke(sender, idToUpdate, request.getBand());
                         break;
                     case ("remove_by_id"):
                         long idToRemove = Long.parseLong(str[1]);
-                        RemoveById remover = new RemoveById(collection, messages);
+                        RemoveById remover = new RemoveById(collection, clientRequest);
                         collection = remover.invoke(sender, idToRemove);
                         break;
                     case ("execute_script"):
-                        ExecuteScript scriptExecutor = new ExecuteScript(messages);
+                        ExecuteScript scriptExecutor = new ExecuteScript(clientRequest);
                         scriptExecutor.execute(request.getScript());
                         break;
-                    /*case ("insert_at"):
-                        int index = Integer.parseInt(str[1]);
-                        InsertAt insertAt = new InsertAt();
-                        insertAt.invoke(sender, collection, index, request.getBand());
-                        break;*/
+
                     case ("remove_greater"):
                         long idToRemoveFrom = Long.parseLong(str[1]);
-                        RemoveGreater removeGreater = new RemoveGreater(collection, messages);
+                        RemoveGreater removeGreater = new RemoveGreater(collection, clientRequest);
                         collection = removeGreater.invoke(sender, idToRemoveFrom);
                         break;
                     case ("count_greater_than_best_album"):
-                        CountGreaterThanBestAlbum countGreaterThanBestAlbum = new CountGreaterThanBestAlbum(collection, messages);
+                        CountGreaterThanBestAlbum countGreaterThanBestAlbum = new CountGreaterThanBestAlbum(collection, clientRequest);
                         countGreaterThanBestAlbum.invoke(str[1]);
-                        break;
-                    case ("check_id"):
-                        long idToCheck = Long.parseLong(str[1]);
-                        CheckId idChecker = new CheckId(collection, messages);
-                        idChecker.invoke(sender, idToCheck);
                         break;
                     default:
                         //System.out.println("Unknown command");
-                        messages.recordMessage("Unknown command");
+                        clientRequest.setMessage(MessageFromServerToClient.ERROR);
+                        //messages.recordMessage("Unknown command");
                 }
             }catch (IndexOutOfBoundsException | IllegalArgumentException e){
-                messages.recordMessage("Incorrect argument");
+                //messages.recordMessage("Incorrect argument");
+                clientRequest.setMessage(MessageFromServerToClient.ERROR);
             }catch (Exception e){
-                messages.recordMessage(e.getMessage());
+                //messages.recordMessage(e.getMessage());
+                logger.warn(e.getMessage());
             }
+            //if clientRequest
+            ServerNew.setBands(collection);
+            clientRequest.setBands(collection.stream().collect(Collectors.toCollection(ArrayList::new)));
+            if (clientRequest.getMessage()!=null){
+                queue.add(clientRequest);
+            }
+            //ServerNew.setBands(collection);
         }while (!CommandsParser.isBufferEmpty());
 
-        return messages;
-
+        LinkedList<ClientRequest> queueCopy = new LinkedList<>();
+        queueCopy.addAll(queue);
+        queue.clear();
+        return queueCopy;
     }
 }

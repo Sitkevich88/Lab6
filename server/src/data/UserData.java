@@ -11,6 +11,8 @@ public class UserData implements Serializable {
     private String login;
     private byte[] password;
 
+    public static final long serialVersionUID = 5123L;
+
     public UserData(String login, byte[] password, AuthMode mode){
         this.login = login;
         this.password = password;

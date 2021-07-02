@@ -1,21 +1,28 @@
 package utils;
 
 
-import org.slf4j.Logger;
 import data.*;
+import org.slf4j.Logger;
 import utils.sql.DataBaseConnector;
 import utils.sql.UserAuthorisation;
-import java.io.*;
-import java.net.*;
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetSocketAddress;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.UnresolvedAddressException;
-import java.sql.*;
+import java.sql.Date;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
-import java.lang.*;
 import java.util.concurrent.*;
+import java.util.stream.Collectors;
 
 
 /**
@@ -26,14 +33,14 @@ public class ServerNew extends Thread{
 
     private static Logger logger;
     private SynchronousQueue<Object> requestExchangerBetweenReceiverAndHandler;
-    private SynchronousQueue<MessagesForClient> requestExchangerBetweenHandlerAndSender;
+    private SynchronousQueue<Integer> requestExchangerBetweenHandlerAndSender;
     private final ExecutorService responseSender = Executors.newFixedThreadPool(3);
     private final ExecutorService requestHandler = Executors.newFixedThreadPool(3);
     private final int PORT;
     private final int PACKET_SIZE = 10000;
     private DatagramSocket socket;
     private volatile DatagramPacket packet ;
-    private CopyOnWriteArrayList<DatagramPacket> packets;
+    //private CopyOnWriteArrayList<DatagramPacket> packets;
     private byte[] buf;
     private RequestsHandler handler;
     private Serializer serializer;
@@ -55,7 +62,7 @@ public class ServerNew extends Thread{
         running = true;
         requestExchangerBetweenReceiverAndHandler = new SynchronousQueue<>();
         requestExchangerBetweenHandlerAndSender = new SynchronousQueue<>();
-        packets = new CopyOnWriteArrayList<>();
+        //packets = new CopyOnWriteArrayList<>();
     }
 
     /**
@@ -99,13 +106,20 @@ public class ServerNew extends Thread{
         }
     }
 
+
+    private static LinkedBlockingQueue<MusicBand> bands = new LinkedBlockingQueue<>();
+
+    public static void setBands(LinkedBlockingQueue<MusicBand> bands) {
+        ServerNew.bands = bands;
+    }
+
     /**
      * loads collection to RequestsHandler
      */
 
     private void loadCollection() {
 
-        LinkedBlockingQueue<MusicBand> bands = new LinkedBlockingQueue<>();
+        //LinkedBlockingQueue<MusicBand> bands = new LinkedBlockingQueue<>();
         try {
             Statement st = DataBaseConnector.getConnection().createStatement();
             ResultSet rs = st.executeQuery("SELECT owner, id, name, x, y, creation_date, number_of_participants, " +
@@ -150,7 +164,7 @@ public class ServerNew extends Thread{
             packet = new DatagramPacket(buf, buf.length);
             try {
                 socket.receive(packet);
-                packets.add(packet);
+                //packets.add(packet);
             } catch (IOException e) {
                 logger.warn("Receiver is interrupted");
                 interrupt();
@@ -184,10 +198,13 @@ public class ServerNew extends Thread{
         return receiver;
     }
 
+    private boolean auth = true;
+    private boolean shouldAnswer = true;
+
     private void handleRequest(){
         requestHandler.submit(()->{
             Object request = null;
-            MessagesForClient messages = new MessagesForClient();
+            //MessageFromServerToClient message = null;
             try {
                 request = requestExchangerBetweenReceiverAndHandler.take();
                 if (request==null){throw new NullPointerException();}
@@ -197,38 +214,67 @@ public class ServerNew extends Thread{
             } catch (NullPointerException e){
                 return;
             }
+            shouldAnswer = true;
            
             if (request instanceof ServerRequest) {
+                //LinkedList<ClientRequest> clientRequests = new LinkedList<>();
+                auth = false;
                 ServerRequest serverRequest = (ServerRequest) request;
-                if (OnlineUsers.isUserOnline(serverRequest.getUserData())){
-                    boolean shouldAnswer;
+                if (OnlineUsers.isAccountOnline(serverRequest.getUserData())){
+                    //boolean shouldAnswer;
                     shouldHandle = true;
                     shouldAnswer = true;
                     if (shouldHandle){
-                        //todo
-                        shouldAnswer = true;
-                        messages = handler.handle(serverRequest);
+                        boolean userExits = serverRequest.getCommand().contains("exit");
+                        if (userExits){
+                            OnlineUsers.removeUser(packet.getPort());
+                            OnlineUsers.removeAccount(serverRequest.getUserData());
+                        }
+                        shouldAnswer = !userExits;
+                        //message = handler.handle(serverRequest);
+                        clientRequests = handler.handle(serverRequest);
                     }
                     if (!shouldAnswer){
-                        responseSender.shutdownNow();
+                        //todo responseSender.shutdownNow();
                     }
                 }else{
-                    messages.recordMessage("You are not authorised");
+                    //messages.recordMessage("You are not authorised");
+                    clientRequests.add(new ClientRequest(MessageFromServerToClient.NOT_AUTHORISED, new ArrayList<>(bands)));
+                }
+                try {
+                    requestExchangerBetweenHandlerAndSender.put(1);
+                } catch (InterruptedException e) {
+                    logger.error(e.getMessage());
+                    e.printStackTrace();
                 }
 
             } else if (request instanceof UserData) {
+                auth = true;
                 UserAuthorisation userAuthorisation = new UserAuthorisation(DataBaseConnector.getConnection());
                 UserData userData = (UserData) request;
-                messages = userAuthorisation.authorise(userData, messages, packet.getPort());
-            }
-            try {
-                requestExchangerBetweenHandlerAndSender.put(messages);
-            } catch (InterruptedException e) {
-                logger.error(e.getMessage());
-                e.printStackTrace();
+                authorisationResult = userAuthorisation.authorise(userData, packet.getPort());
+                if (authorisationResult.equals(AuthorisationResult.OK)){
+                    OnlineUsers.addUser(packet.getPort());
+                }
+                try {
+                    requestExchangerBetweenHandlerAndSender.put(2);
+                } catch (InterruptedException e) {
+                    logger.error(e.getMessage());
+                    e.printStackTrace();
+                }
+            } else {
+                shouldAnswer = false;
+                try {
+                    requestExchangerBetweenHandlerAndSender.put(2);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         });
     }
+
+    private AuthorisationResult authorisationResult;
+    private LinkedList<ClientRequest> clientRequests = new LinkedList<>();
 
 
     /**
@@ -237,16 +283,53 @@ public class ServerNew extends Thread{
 
     private Future sendRequest(){
         Future<Boolean> future = responseSender.submit(() -> {
+            //boolean a = false;
             try {
-
-                MessagesForClient messages = requestExchangerBetweenHandlerAndSender.take();
+                byte[] localBuffer = new byte[1];
+                int number = requestExchangerBetweenHandlerAndSender.take();
+                if (!shouldAnswer){
+                    return true;
+                }
                 logger.warn("Server is trying to send a request to user " + packet.getPort());
-                ClientRequest clientRequest = new ClientRequest(messages.popMessagesInString());
-                clientRequest.setResult(messages.isCheckResult());
-                byte[] localBuffer = serializer.serialize(clientRequest);
-                packet = new DatagramPacket(localBuffer, localBuffer.length, packet.getAddress(), packet.getPort());
-                socket.send(packet);
-                logger.info("Request is sent to user " + packet.getPort());
+                if (auth){
+                    AuthorisationServerAnswer answer = new AuthorisationServerAnswer(authorisationResult);
+                    answer.setBands(bands.stream().collect(Collectors.toCollection(ArrayList::new)));
+                    auth = false;
+                    localBuffer = serializer.serialize(answer);
+                    packet = new DatagramPacket(localBuffer, localBuffer.length, packet.getAddress(), packet.getPort());
+                    socket.send(packet);
+                    logger.info("Request is sent to user " + packet.getPort());
+                }else {
+                    for (ClientRequest req : clientRequests){
+                        boolean shouldSendEverybody = false;
+                        switch (req.getMessage()){
+                            case OBJECT_ADDED:
+                            case OBJECT_REMOVED:
+                            case OBJECT_UPDATED:
+                            case MANY_OBJECTS_REMOVED:
+                            case PRIVATE_COLLECTION_CLEARED:
+                                shouldSendEverybody = true;
+                                break;
+                            default:
+                                shouldSendEverybody = false;
+                        }
+                        if (shouldSendEverybody){
+                            for(int port : OnlineUsers.getUsers()){
+                                localBuffer = serializer.serialize(req);
+                                packet = new DatagramPacket(localBuffer, localBuffer.length, packet.getAddress(), port);
+                                socket.send(packet);
+                                logger.info("Request is sent to user " + port);
+                            }
+                        }else{
+                            localBuffer = serializer.serialize(req);
+                            packet = new DatagramPacket(localBuffer, localBuffer.length, packet.getAddress(), packet.getPort());
+                            socket.send(packet);
+                            logger.info("Request is sent to user " + packet.getPort());
+                            sleep(20);
+                        }
+                    }
+                }
+
             } catch (InterruptedException e) {
                 logger.warn("Sender is interrupted");
                 interrupt();

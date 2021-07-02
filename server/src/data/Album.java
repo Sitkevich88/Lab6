@@ -5,9 +5,14 @@ import java.util.Objects;
 
 public class Album implements Comparable<Album>, Serializable {
 
-    private String name;
+    public static final long serialVersionUID = 1000L;
+
     /**
      * The field cannot be null, String cannot be empty
+     */
+    private String name;
+    /**
+     * The field value must be greater than 0
      */
     private int tracks;
     /**
@@ -15,12 +20,10 @@ public class Album implements Comparable<Album>, Serializable {
      */
     private int length;
     /**
-     * The field value must be greater than 0
-     */
-    private Float sales;
-    /**
      * The field can be null, The field value must be greater than 0
      */
+    private Float sales;
+
 
     public Album(String name, int tracks, int length, Float sales) {
         this.name = name;
