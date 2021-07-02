@@ -1,6 +1,6 @@
 execute_script .\src\data\script.txt
 add
-Anacondaz
+Angel
 1
 3
 6

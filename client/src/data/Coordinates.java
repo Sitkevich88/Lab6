@@ -4,6 +4,9 @@ import java.io.Serializable;
 import java.util.Objects;
 
 public class Coordinates implements Serializable {
+
+    public static final long serialVersionUID = 3000L;
+
     private long x;
     private Integer y;
     /**
@@ -30,6 +33,14 @@ public class Coordinates implements Serializable {
         return y;
     }
 
+    public void setX(long x) {
+        this.x = x;
+    }
+
+    public void setY(Integer y) {
+        this.y = y;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -46,7 +57,7 @@ public class Coordinates implements Serializable {
 
     @Override
     public String toString() {
-        return "data.Coordinates{" +
+        return "Coordinates{" +
                 "x=" + x +
                 ", y=" + y +
                 '}';

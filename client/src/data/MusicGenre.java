@@ -13,6 +13,8 @@ public enum MusicGenre implements Serializable {
 
     private final String title;
 
+    public static final long serialVersionUID = 5000L;
+
     MusicGenre(String title) {
         this.title = title.toLowerCase();
     }
@@ -21,16 +23,6 @@ public enum MusicGenre implements Serializable {
         return title;
     }
 
-    /**
-     * Prints all enum values
-     */
-    public static void printAllValues(){
-        System.out.print("\u001B[34m");
-        for (MusicGenre genre : MusicGenre.values()){
-            System.out.print(genre.getTitle() + '\n');
-        }
-        System.out.print("\u001B[0m");
-    }
 
     /**
      *

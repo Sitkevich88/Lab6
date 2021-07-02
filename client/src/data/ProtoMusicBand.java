@@ -37,7 +37,8 @@ public class ProtoMusicBand implements Serializable {
     private Album bestAlbum;
 
 
-    public ProtoMusicBand(String name, Coordinates coordinates, Integer numberOfParticipants, String description, ZonedDateTime establishmentDate, MusicGenre genre, Album bestAlbum){
+    public ProtoMusicBand(String name, Coordinates coordinates, Integer numberOfParticipants, String description,
+                          ZonedDateTime establishmentDate, MusicGenre genre, Album bestAlbum){
         this.name = name;
         this.coordinates = coordinates;
         this.numberOfParticipants = numberOfParticipants;

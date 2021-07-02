@@ -1,34 +1,55 @@
 package data;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class ClientRequest implements Serializable {
 
-    private String messages;
-    private boolean checkResult = false;
+    public static final long serialVersionUID = 2000L;
 
-    public ClientRequest(String messages){
-        this.messages = messages;
+    private String author;
+
+    private MessageFromServerToClient message;
+    private ArrayList<MusicBand> bands;
+    private ArrayList<String> words = new ArrayList<>();
+
+    public ClientRequest(){}
+
+    public ClientRequest(MessageFromServerToClient message, ArrayList<MusicBand> bands){
+        this.message = message;
+        this.bands = bands;
     }
 
-    public ClientRequest(String messages, boolean checkResult){
-        this.messages = messages;
-        this.checkResult = checkResult;
+    public ArrayList<MusicBand> getBands() {
+        return bands;
     }
 
-    public ClientRequest(boolean checkResult){
-        this.checkResult = checkResult;
+    public void setBands(ArrayList<MusicBand> bands) {
+        this.bands = bands;
     }
 
-    public String getMessages(){
-        return messages;
+    public MessageFromServerToClient getMessage() {
+        return message;
     }
 
-    public boolean getResult() {
-        return checkResult;
+    public void setMessage(MessageFromServerToClient message) {
+        this.message = message;
     }
 
-    public void setResult(boolean checkResult) {
-        this.checkResult = checkResult;
+    public ArrayList<String> getWords() {
+        return words;
+    }
+
+    public void addWords(String[] newWords) {
+        words.addAll(Arrays.asList(newWords));
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
     }
 }
