@@ -47,12 +47,6 @@ public class App extends Application {
             return;
         }
         client = new ClientNew("localhost", 19117);
-        /*if (client.connect()){
-            Runnable r = () -> {
-                Application.launch();
-            };
-            new Thread(r).start();
-        }*/
         Runnable r = () -> {
             Application.launch();
         };
@@ -76,7 +70,6 @@ public class App extends Application {
 
     public static void receiveClientRequest(ClientRequest clientRequest){
         App.setCurrentWindow(AppWindow.MAIN_TABLE);
-        //Message mes = App.convert(authorisationServerAnswer.gerAuthorisationResult());
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
