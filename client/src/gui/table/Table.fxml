@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import org.controlsfx.control.textfield.CustomTextField?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1280.0" style="-fx-background-color: #121212;" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.table.TableController">
+    <top>
+        <Label fx:id="userName" alignment="CENTER" contentDisplay="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minWidth="500.0" prefHeight="83.0" prefWidth="1424.0" style="-fx-background-color: #5B04BC;" text="Имя пользователя" textAlignment="CENTER" textFill="WHITE" BorderPane.alignment="TOP_CENTER">
+            <font>
+                <Font name="Lucida Sans Demibold Roman" size="37.0" />
+            </font>
+        </Label>
+    </top>
+   <center>
+        <AnchorPane prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: #121212;" BorderPane.alignment="CENTER">
+            <children>
+                <Label fx:id="message" layoutX="330.0" layoutY="600.0" prefHeight="100.0" prefWidth="200.0" text="Ошибка" textAlignment="CENTER" textFill="WHITE" visible="false" wrapText="true">
+                    <font>
+                        <Font name="Lucida Sans Demibold Roman" size="14.0" />
+                    </font>
+                </Label>
+            <TableView fx:id="table" editable="true" fixedCellSize="40.0" minWidth="100.0" onSort="#idSort" pickOnBounds="false" prefHeight="494.0" prefWidth="1131.0" AnchorPane.bottomAnchor="200.0" AnchorPane.leftAnchor="400.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="20.0">
+               <columns>
+                  <TableColumn fx:id="id" editable="false" prefWidth="46.399993896484375" text="id">
+
+                  </TableColumn>
+                   <TableColumn fx:id="owner" editable="false" prefWidth="100.0" text="Владелец" />
+                   <TableColumn fx:id="name" prefWidth="164.0" text="Название группы" />
+                   <TableColumn fx:id="coordinates" minWidth="150.0" prefWidth="150.0" text="Координаты">
+                       <columns>
+                           <TableColumn minWidth="70.0" prefWidth="75.0" text="X" fx:id="x" />
+                           <TableColumn fx:id="y" minWidth="70.0" prefWidth="75.0" text="Y" />
+                       </columns>
+                   </TableColumn>
+                   <TableColumn fx:id="establishmentDate" prefWidth="183.0" text="Основание группы" />
+                   <TableColumn fx:id="numberOfParticipants" minWidth="32.0" prefWidth="200.0" text="Участники" />
+                   <TableColumn fx:id="description" minWidth="0.0" prefWidth="164.0" text="Описание" />
+                   <TableColumn fx:id="creationDate" editable="false" prefWidth="100.0" text="Создание объекта" />
+                   <TableColumn fx:id="genre" prefWidth="100.0" text="Жанр" />
+                   <TableColumn fx:id="album" minWidth="311.2000732421875" prefWidth="400.0" text="Альбом">
+                       <columns>
+                           <TableColumn fx:id="albumName" minWidth="30.0" prefWidth="100.0" text="Имя" />
+                           <TableColumn fx:id="tracks" minWidth="0.0" prefWidth="100.0" text="Песни" />
+                           <TableColumn fx:id="length" minWidth="30.0" prefWidth="100.0" text="Длина" />
+                           <TableColumn fx:id="sales" maxWidth="1.7976931348623157E308" minWidth="40.0" prefWidth="100.0" text="Продажи" />
+                       </columns>
+                   </TableColumn>
+               </columns>
+            </TableView>
+            <FlowPane layoutX="20.0" layoutY="78.0" prefHeight="285.0" prefWidth="210.0" style="-fx-background-color: #1D1D1D;" AnchorPane.bottomAnchor="347.0" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="78.0">
+               <children>
+                  <Label fx:id="graphic" alignment="CENTER" contentDisplay="CENTER" prefHeight="42.0" prefWidth="320.0" style="-fx-background-color: #5B04BC;" text="Отображение" textAlignment="CENTER" textFill="WHITE">
+                     <font>
+                        <Font name="System Bold" size="17.0" />
+                     </font>
+                  </Label>
+                  <AnchorPane fx:id="objectsShower" />
+               </children>
+            </FlowPane>
+            <VBox alignment="CENTER" layoutX="400.0" layoutY="535.0" prefHeight="118.0" prefWidth="860.0" AnchorPane.bottomAnchor="75.0" AnchorPane.leftAnchor="400.0" AnchorPane.rightAnchor="20.0">
+               <children>
+                  <HBox alignment="CENTER" prefHeight="100.0" prefWidth="826.0" spacing="30.0">
+                     <children>
+                        <Button fx:id="infoButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onMouseClicked="#info" prefHeight="30.0" prefWidth="144.0" style="-fx-background-color: #5b04bc;" text="Информация" textAlignment="CENTER" textFill="WHITE">
+                           <font>
+                              <Font name="System Bold" size="14.0" />
+                           </font>
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor>
+                        </Button>
+                        <Button fx:id="clearButton" alignment="CENTER" contentDisplay="CENTER" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onMouseClicked="#clear" prefHeight="30.0" prefWidth="144.0" style="-fx-background-color: #5b04bc;" text="Очистка" textAlignment="CENTER" textFill="WHITE">
+                           <font>
+                              <Font name="System Bold" size="14.0" />
+                           </font>
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor>
+                        </Button>
+                        <Button fx:id="sumOfParticipantsButton" alignment="CENTER" contentDisplay="CENTER" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onMouseClicked="#countParticipants" prefHeight="30.0" prefWidth="240.0" style="-fx-background-color: #5b04bc;" text="Сумма участников" textAlignment="CENTER" textFill="WHITE">
+                           <font>
+                              <Font name="System Bold" size="14.0" />
+                           </font>
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor>
+                        </Button>
+                        <Button fx:id="removeGreaterButton" alignment="CENTER" contentDisplay="CENTER" layoutX="60.0" layoutY="10.0" mnemonicParsing="false" onMouseClicked="#removeGreater" prefHeight="30.0" prefWidth="180.0" style="-fx-background-color: #5b04bc;" text="Удалить больше" textAlignment="CENTER" textFill="WHITE">
+                           <font>
+                              <Font name="System Bold" size="14.0" />
+                           </font>
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor>
+                        </Button>
+                     </children>
+                  </HBox>
+                  <HBox alignment="TOP_CENTER" layoutX="10.0" layoutY="10.0" prefHeight="100.0" prefWidth="860.0" spacing="30.0">
+                     <children>
+                        <Button fx:id="fieldAscendingDescriptionButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onMouseDragged="#printDescriptions" prefHeight="30.0" prefWidth="200.0" style="-fx-background-color: #5b04bc;" text="Описание больше" textAlignment="CENTER" textFill="WHITE">
+                           <font>
+                              <Font name="System Bold" size="14.0" />
+                           </font>
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor>
+                        </Button>
+                        <Button fx:id="greaterThanBestAlbumButton" alignment="CENTER" contentDisplay="CENTER" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onMouseClicked="#countGreaterAlbums" prefHeight="30.0" prefWidth="200.0" style="-fx-background-color: #5b04bc;" text="Альбом больше" textAlignment="CENTER" textFill="WHITE">
+                           <font>
+                              <Font name="System Bold" size="14.0" />
+                           </font>
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor>
+                        </Button>
+                        <Button fx:id="scriptButton" alignment="CENTER" contentDisplay="CENTER" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onMouseClicked="#executeScript" prefHeight="30.0" prefWidth="200.0" style="-fx-background-color: #5b04bc;" text="Запустить скрипт" textAlignment="CENTER" textFill="WHITE">
+                           <font>
+                              <Font name="System Bold" size="14.0" />
+                           </font>
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor>
+                        </Button>
+                     </children>
+                  </HBox>
+               </children>
+            </VBox>
+            <VBox alignment="BOTTOM_CENTER" layoutX="1255.0" layoutY="478.0" prefHeight="88.0" prefWidth="160.0" spacing="10.0" AnchorPane.bottomAnchor="20.0" AnchorPane.rightAnchor="20.0">
+               <children>
+                  <Button fx:id="helpButton" alignment="CENTER" contentDisplay="CENTER" disable="true" mnemonicParsing="false" onMouseClicked="#help" prefHeight="30.0" prefWidth="144.0" style="-fx-background-color: #4169E1;" text="Помощь" textAlignment="CENTER" textFill="WHITE" visible="false">
+                     <font>
+                        <Font name="System Bold" size="14.0" />
+                     </font>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Button>
+                      <ComboBox id="languageButton" fx:id="languageButton" onAction="#switchLanguage" prefWidth="144.0" promptText="Русский" />
+               </children>
+            </VBox>
+                  <Button fx:id="exitButton" alignment="CENTER" contentDisplay="CENTER" layoutX="23.0" layoutY="622.0" mnemonicParsing="false" onMouseClicked="#goBack" prefHeight="30.0" prefWidth="144.0" style="-fx-background-color: #C22047;" text="Выйти" textAlignment="CENTER" textFill="WHITE" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="20.0">
+                      <font>
+                          <Font name="System Bold" size="14.0" />
+                      </font>
+                      <cursor>
+                          <Cursor fx:constant="HAND" />
+                      </cursor>
+                  </Button>
+            <VBox alignment="CENTER" layoutX="56.0" layoutY="382.0" prefHeight="200.0" prefWidth="246.0" spacing="20.0" AnchorPane.bottomAnchor="135.0" AnchorPane.leftAnchor="56.0">
+               <children>
+                  <Button fx:id="addButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onMouseClicked="#add" prefHeight="35.0" prefWidth="144.0" style="-fx-background-color: #5b04bc;" text="Добавить группу" textAlignment="CENTER" textFill="WHITE">
+                     <font>
+                        <Font name="System Bold" size="14.0" />
+                     </font>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Button>
+                  <Button fx:id="updateButton" alignment="CENTER" contentDisplay="CENTER" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onMouseClicked="#update" prefHeight="35.0" prefWidth="144.0" style="-fx-background-color: #5b04bc;" text="Обновить группу" textAlignment="CENTER" textFill="WHITE">
+                     <font>
+                        <Font name="System Bold" size="14.0" />
+                     </font>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Button>
+                  <Button fx:id="removeButton" alignment="CENTER" contentDisplay="CENTER" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onMouseClicked="#remove" prefHeight="35.0" prefWidth="144.0" style="-fx-background-color: #5b04bc;" text="Удалить группу" textAlignment="CENTER" textFill="WHITE">
+                     <font>
+                        <Font name="System Bold" size="14.0" />
+                     </font>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Button>
+               </children>
+            </VBox>
+            <CustomTextField fx:id="searcher" layoutX="56.0" layoutY="20.0" prefHeight="31.0" prefWidth="320.0" AnchorPane.leftAnchor="20.0" />
+            </children>
+        </AnchorPane>
+   </center>
+</BorderPane>

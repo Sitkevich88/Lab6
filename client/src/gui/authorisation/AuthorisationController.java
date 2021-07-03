@@ -62,7 +62,20 @@ public class AuthorisationController{
 
         App.getClient().authorise(credentialsWithMode);
         App.setUserName(login);
-        
+        //Message message2 = App.getAuthorisationWindowCommunicator().takeMessage();
+        /*if (message2==null){
+            return;
+        }
+        if (message2.equals(Message.OK)){
+            Stage thisWindow = (Stage)signInButton.getScene().getWindow();
+            thisWindow.close();
+            openWindow(thisWindow.getTitle());
+            //thisWindow.close();
+        } else {
+            loginField.setStyle("-fx-background-color: #ffffff");
+            passwordField.setStyle("-fx-background-color: #ffffff");
+        }
+        showMessage(message2);*/
     }
 
     public void receiveMessage(Message message){
@@ -155,6 +168,12 @@ public class AuthorisationController{
         setLanguage(switcher.getLocale(languageButton));
     }
 
+
+    /*private String getMessage(String key){
+        Locale locale = switcher.getLocale(languageButton);
+        ResourceBundle labels = ResourceBundle.getBundle("gui.Messages", locale, new UTF8Control());
+        return switcher.getLocaleString(labels, key);
+    }*/
 
 
     private void setLanguage(Locale chosenLanguage){

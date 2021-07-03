@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="641.0" prefWidth="590.0" style="-fx-background-color: #939598;" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.table.FormController">
+   <children>
+      <Button fx:id="okButton" layoutX="532.0" layoutY="355.0" mnemonicParsing="false" onMouseClicked="#okPressed" text="OK" AnchorPane.bottomAnchor="15.0" AnchorPane.rightAnchor="15.0" />
+      <VBox alignment="CENTER" layoutX="286.0" layoutY="-3.0" prefHeight="641.0" prefWidth="281.0" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="60.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <ComboBox fx:id="idField" prefHeight="31.0" prefWidth="261.0" />
+            <TextField fx:id="groupNameField" layoutX="10.0" layoutY="377.0" prefHeight="31.0" prefWidth="350.0" />
+            <TextField prefHeight="31.0" prefWidth="350.0" fx:id="xField" />
+            <TextField fx:id="yField" layoutX="10.0" layoutY="295.0" prefHeight="31.0" prefWidth="212.0" />
+            <TextField fx:id="participantsField" layoutX="10.0" layoutY="336.0" prefHeight="31.0" prefWidth="350.0" />
+            <TextField fx:id="descriptionField" layoutX="10.0" layoutY="254.0" prefHeight="31.0" prefWidth="212.0" />
+            <DatePicker fx:id="dateField" prefHeight="31.0" prefWidth="261.0" />
+            <ComboBox fx:id="genreField" prefHeight="31.0" prefWidth="261.0" />
+            <TextField fx:id="albumNameField" layoutX="10.0" layoutY="336.0" prefHeight="31.0" prefWidth="212.0" />
+            <TextField fx:id="tracksField" layoutX="10.0" layoutY="377.0" prefHeight="31.0" prefWidth="350.0" />
+            <TextField fx:id="lengthField" layoutX="10.0" layoutY="336.0" prefHeight="31.0" prefWidth="212.0" />
+            <TextField fx:id="salesField" layoutX="10.0" layoutY="418.0" prefHeight="31.0" prefWidth="212.0" />
+         </children>
+         <padding>
+            <Insets left="10.0" right="10.0" />
+         </padding>
+      </VBox>
+      <VBox alignment="CENTER" prefHeight="641.0" prefWidth="183.0" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="347.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <Label fx:id="id" alignment="CENTER_RIGHT" prefHeight="31.0" prefWidth="295.0" text="ID">
+               <font>
+                  <Font name="System Bold Italic" size="15.0" />
+               </font>
+            </Label>
+            <Label fx:id="groupName" alignment="CENTER_RIGHT" layoutX="10.0" layoutY="315.0" prefHeight="31.0" prefWidth="295.0" text="Имя">
+               <font>
+                  <Font name="System Bold Italic" size="15.0" />
+               </font>
+            </Label>
+            <Label alignment="CENTER_RIGHT" layoutX="10.0" layoutY="295.0" prefHeight="31.0" prefWidth="295.0" text="X" fx:id="x">
+               <font>
+                  <Font name="System Bold Italic" size="15.0" />
+               </font>
+            </Label>
+            <Label fx:id="y" alignment="CENTER_RIGHT" layoutX="10.0" layoutY="336.0" prefHeight="31.0" prefWidth="295.0" text="Y">
+               <font>
+                  <Font name="System Bold Italic" size="15.0" />
+               </font>
+            </Label>
+            <Label fx:id="participants" alignment="CENTER_RIGHT" layoutX="10.0" layoutY="254.0" prefHeight="31.0" prefWidth="295.0" text="Участники">
+               <font>
+                  <Font name="System Bold Italic" size="15.0" />
+               </font>
+            </Label>
+            <Label fx:id="description" alignment="CENTER_RIGHT" layoutX="10.0" layoutY="295.0" prefHeight="31.0" prefWidth="295.0" text="Описание">
+               <font>
+                  <Font name="System Bold Italic" size="15.0" />
+               </font>
+            </Label>
+            <Label fx:id="establishmentDate" alignment="CENTER_RIGHT" layoutX="10.0" layoutY="336.0" prefHeight="31.0" prefWidth="295.0" text="Дата Создания">
+               <font>
+                  <Font name="System Bold Italic" size="15.0" />
+               </font>
+            </Label>
+            <Label fx:id="genre" alignment="CENTER_RIGHT" layoutX="10.0" layoutY="377.0" prefHeight="31.0" prefWidth="295.0" text="Жанр">
+               <font>
+                  <Font name="System Bold Italic" size="15.0" />
+               </font>
+            </Label>
+            <Label fx:id="albumName" alignment="CENTER_RIGHT" layoutX="10.0" layoutY="336.0" prefHeight="31.0" prefWidth="295.0" text="Имя альбома">
+               <font>
+                  <Font name="System Bold Italic" size="15.0" />
+               </font>
+            </Label>
+            <Label fx:id="tracks" alignment="CENTER_RIGHT" layoutX="10.0" layoutY="377.0" prefHeight="31.0" prefWidth="295.0" text="Количество">
+               <font>
+                  <Font name="System Bold Italic" size="15.0" />
+               </font>
+            </Label>
+            <Label fx:id="length" alignment="CENTER_RIGHT" layoutX="10.0" layoutY="418.0" prefHeight="31.0" prefWidth="295.0" text="Длина">
+               <font>
+                  <Font name="System Bold Italic" size="15.0" />
+               </font>
+            </Label>
+            <Label fx:id="sales" alignment="CENTER_RIGHT" layoutX="10.0" layoutY="459.0" prefHeight="31.0" prefWidth="295.0" text="Продажи">
+               <font>
+                  <Font name="System Bold Italic" size="15.0" />
+               </font>
+            </Label>
+         </children>
+      </VBox>
+      <Button fx:id="cancelButton" cancelButton="true" layoutX="544.0" layoutY="605.0" mnemonicParsing="false" onAction="#cancel" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="15.0" />
+   </children>
+</AnchorPane>
